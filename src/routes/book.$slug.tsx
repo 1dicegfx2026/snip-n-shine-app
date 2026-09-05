@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CreditCard, ShieldCheck, PartyPopper } from "lucide-react";
 import { getBarber, getSlots, nextNDates, formatDateLong, DEPOSIT_RATE } from "@/lib/data/barbers";
 import { useBookings } from "@/lib/booking-store";
+import { PAY_METHODS, type PayMethod } from "@/lib/site-store";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/book/$slug")({
@@ -38,6 +39,7 @@ function BookingFlow() {
   const [time, setTime] = useState(search.time);
   const [name, setName] = useState("");
   const [payType, setPayType] = useState<"deposit" | "full">("deposit");
+  const [payMethod, setPayMethod] = useState<PayMethod>("card");
   const [confirmed, setConfirmed] = useState(false);
 
   const service = barber.services.find((s) => s.id === serviceId);
