@@ -135,16 +135,17 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SiteProvider>
-      <BookingProvider>
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          <Footer />
-        </div>
-        <Toaster theme="dark" position="bottom-right" richColors />
-      </BookingProvider>
+        <BookingProvider>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">
+              <Outlet />
+            </main>
+            <Footer />
+          </div>
+          <Toaster theme="dark" position="bottom-right" richColors />
+        </BookingProvider>
+      </SiteProvider>
     </QueryClientProvider>
   );
 }
