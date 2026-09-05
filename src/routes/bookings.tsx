@@ -150,7 +150,7 @@ function BookingsPage() {
                     <Link
                       to="/book/$slug"
                       params={{ slug: barber.slug }}
-                      search={{ service: b.serviceId }}
+                      search={{ service: b.serviceId, date: "", time: "" }}
                       className="flex items-center gap-1 text-xs font-semibold text-gold hover:underline"
                     >
                       <CalendarPlus size={13} /> Rebook

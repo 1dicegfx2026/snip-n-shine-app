@@ -7,9 +7,9 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/book/$slug")({
   validateSearch: (s: Record<string, unknown>) => ({
-    service: typeof s.service === "string" ? s.service : "",
-    date: typeof s.date === "string" ? s.date : "",
-    time: typeof s.time === "string" ? s.time : "",
+    service: typeof s["service"] === "string" ? (s["service"] as string) : "",
+    date: typeof s["date"] === "string" ? (s["date"] as string) : "",
+    time: typeof s["time"] === "string" ? (s["time"] as string) : "",
   }),
   loader: ({ params }) => {
     const barber = getBarber(params.slug);

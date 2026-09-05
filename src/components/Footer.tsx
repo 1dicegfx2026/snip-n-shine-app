@@ -22,7 +22,7 @@ export function Footer() {
             <div>
               <p className="font-display font-semibold text-foreground">Clients</p>
               <ul className="mt-3 space-y-2 text-muted-foreground">
-                <li><Link to="/explore" className="hover:text-gold">Find a barber</Link></li>
+                <li><Link to="/explore" search={{ q: "" }} className="hover:text-gold">Find a barber</Link></li>
                 <li><Link to="/bookings" className="hover:text-gold">My bookings</Link></li>
                 <li><Link to="/explore" search={{ q: "fades" }} className="hover:text-gold">Top fades</Link></li>
               </ul>

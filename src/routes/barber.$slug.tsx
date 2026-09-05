@@ -120,7 +120,7 @@ function BarberProfile() {
                     <Link
                       to="/book/$slug"
                       params={{ slug: barber.slug }}
-                      search={{ service: s.id }}
+                      search={{ service: s.id, date: "", time: "" }}
                       className="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/85"
                     >
                       Book
@@ -242,7 +242,7 @@ function BarberProfile() {
             <Link
               to="/book/$slug"
               params={{ slug: barber.slug }}
-              search={{ service: "" }}
+              search={{ service: "", date: "", time: "" }}
               className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-gold px-4 py-3 font-display text-sm font-bold text-gold-foreground transition-colors hover:bg-gold/90"
             >
               <CalendarPlus size={16} /> Book an appointment

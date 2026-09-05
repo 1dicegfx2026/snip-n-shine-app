@@ -21,6 +21,7 @@ export function Header() {
         <nav className="flex items-center gap-1 sm:gap-2">
           <Link
             to="/explore"
+            search={{ q: "" }}
             className="rounded-lg px-3 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
             activeProps={{ className: "text-gold hover:text-gold" }}
           >

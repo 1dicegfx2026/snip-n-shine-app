@@ -5,7 +5,7 @@ import { BARBERS, CATEGORIES, type ServiceCategory } from "@/lib/data/barbers";
 import { BarberCard, priceTierLabel } from "@/components/BarberCard";
 
 export const Route = createFileRoute("/explore")({
-  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : "" }),
+  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s["q"] === "string" ? (s["q"] as string) : "" }),
   head: () => ({
     meta: [
       { title: "Explore Barbers & Salons — GILT" },
