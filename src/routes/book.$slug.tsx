@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CreditCard, ShieldCheck, PartyPopper } from "lucide-react";
 import { getBarber, getSlots, nextNDates, formatDateLong, DEPOSIT_RATE } from "@/lib/data/barbers";
 import { useBookings } from "@/lib/booking-store";
+import { PAY_METHODS, type PayMethod } from "@/lib/site-store";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/book/$slug")({
@@ -38,6 +39,7 @@ function BookingFlow() {
   const [time, setTime] = useState(search.time);
   const [name, setName] = useState("");
   const [payType, setPayType] = useState<"deposit" | "full">("deposit");
+  const [payMethod, setPayMethod] = useState<PayMethod>("card");
   const [confirmed, setConfirmed] = useState(false);
 
   const service = barber.services.find((s) => s.id === serviceId);
@@ -235,26 +237,49 @@ function BookingFlow() {
 
                 <div className="rounded-lg border border-dashed border-border bg-background p-4">
                   <p className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-                    <CreditCard size={14} /> Card details
+                    <CreditCard size={14} /> Método de pago
                   </p>
-                  <div className="mt-2 grid gap-2">
-                    <input
-                      placeholder="4242 4242 4242 4242"
-                      inputMode="numeric"
-                      className="rounded-lg border border-input bg-card px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
-                    />
-                    <div className="grid grid-cols-2 gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {PAY_METHODS.map((m) => (
+                      <button
+                        key={m.id}
+                        onClick={() => setPayMethod(m.id)}
+                        className={`rounded-lg border px-3 py-2 text-xs font-bold transition-colors ${
+                          payMethod === m.id
+                            ? "border-gold bg-gold/10 text-gold"
+                            : "border-border hover:border-muted-foreground/40"
+                        }`}
+                      >
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {payMethod === "card" ? (
+                    <div className="mt-3 grid gap-2">
                       <input
-                        placeholder="MM / YY"
-                        className="rounded-lg border border-input bg-card px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
-                      />
-                      <input
-                        placeholder="CVC"
+                        placeholder="4242 4242 4242 4242"
                         inputMode="numeric"
                         className="rounded-lg border border-input bg-card px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
                       />
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          placeholder="MM / YY"
+                          className="rounded-lg border border-input bg-card px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
+                        />
+                        <input
+                          placeholder="CVC"
+                          inputMode="numeric"
+                          className="rounded-lg border border-input bg-card px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <p className="mt-3 rounded-lg border border-border bg-card px-4 py-3 text-xs text-muted-foreground">
+                      {PAY_METHODS.find((m) => m.id === payMethod)?.hint}
+                    </p>
+                  )}
+
                   <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
                     <ShieldCheck size={12} className="text-primary" /> Demo checkout — no real charge is made.
                   </p>
@@ -294,6 +319,7 @@ function BookingFlow() {
                   time,
                   name: name.trim(),
                   payType,
+                  payMethod,
                   amountPaid: dueToday,
                   total,
                 });

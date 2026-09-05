@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BookingProvider } from "../lib/booking-store";
+import { SiteProvider } from "../lib/site-store";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 
@@ -99,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -133,16 +134,18 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BookingProvider>
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          <Footer />
-        </div>
-        <Toaster theme="dark" position="bottom-right" richColors />
-      </BookingProvider>
+      <SiteProvider>
+        <BookingProvider>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">
+              <Outlet />
+            </main>
+            <Footer />
+          </div>
+          <Toaster theme="dark" position="bottom-right" richColors />
+        </BookingProvider>
+      </SiteProvider>
     </QueryClientProvider>
   );
 }

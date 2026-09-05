@@ -8,6 +8,7 @@ export interface Booking {
   time: string;
   name: string;
   payType: "deposit" | "full";
+  payMethod?: string;
   amountPaid: number;
   total: number;
   createdAt: number;
