@@ -166,7 +166,7 @@ function CelebPage() {
           </aside>
 
           {/* Main */}
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <Panel accent={celeb.themeAccent} title="Galería">
               <div className="grid grid-cols-3 gap-2">
                 {celeb.gallery.map((g, i) => (
