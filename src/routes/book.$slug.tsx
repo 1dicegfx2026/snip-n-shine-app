@@ -319,6 +319,7 @@ function BookingFlow() {
                   time,
                   name: name.trim(),
                   payType,
+                  payMethod,
                   amountPaid: dueToday,
                   total,
                 });
