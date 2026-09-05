@@ -11,13 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AffiliatesRouteImport } from './routes/affiliates'
 import { Route as BookingsRouteImport } from './routes/bookings'
 import { Route as CelebritiesRouteImport } from './routes/celebrities'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as SponsorsRouteImport } from './routes/sponsors'
 import { Route as BarberSlugRouteImport } from './routes/barber.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
 import { Route as CelebritySlugRouteImport } from './routes/celebrity.$slug'
+import { Route as CelebrityNewRouteImport } from './routes/celebrity.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -27,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AffiliatesRoute = AffiliatesRouteImport.update({
+  id: '/affiliates',
+  path: '/affiliates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookingsRoute = BookingsRouteImport.update({
@@ -49,6 +57,11 @@ const ExploreRoute = ExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SponsorsRoute = SponsorsRouteImport.update({
+  id: '/sponsors',
+  path: '/sponsors',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BarberSlugRoute = BarberSlugRouteImport.update({
   id: '/barber/$slug',
   path: '/barber/$slug',
@@ -64,87 +77,113 @@ const CelebritySlugRoute = CelebritySlugRouteImport.update({
   path: '/celebrity/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CelebrityNewRoute = CelebrityNewRouteImport.update({
+  id: '/celebrity/new',
+  path: '/celebrity/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/affiliates': typeof AffiliatesRoute
   '/bookings': typeof BookingsRoute
   '/celebrities': typeof CelebritiesRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
+  '/sponsors': typeof SponsorsRoute
   '/barber/$slug': typeof BarberSlugRoute
   '/book/$slug': typeof BookSlugRoute
   '/celebrity/$slug': typeof CelebritySlugRoute
+  '/celebrity/new': typeof CelebrityNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/affiliates': typeof AffiliatesRoute
   '/bookings': typeof BookingsRoute
   '/celebrities': typeof CelebritiesRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
+  '/sponsors': typeof SponsorsRoute
   '/barber/$slug': typeof BarberSlugRoute
   '/book/$slug': typeof BookSlugRoute
   '/celebrity/$slug': typeof CelebritySlugRoute
+  '/celebrity/new': typeof CelebrityNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/affiliates': typeof AffiliatesRoute
   '/bookings': typeof BookingsRoute
   '/celebrities': typeof CelebritiesRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
+  '/sponsors': typeof SponsorsRoute
   '/barber/$slug': typeof BarberSlugRoute
   '/book/$slug': typeof BookSlugRoute
   '/celebrity/$slug': typeof CelebritySlugRoute
+  '/celebrity/new': typeof CelebrityNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin'
+    | '/affiliates'
     | '/bookings'
     | '/celebrities'
     | '/dashboard'
     | '/explore'
+    | '/sponsors'
     | '/barber/$slug'
     | '/book/$slug'
     | '/celebrity/$slug'
+    | '/celebrity/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/affiliates'
     | '/bookings'
     | '/celebrities'
     | '/dashboard'
     | '/explore'
+    | '/sponsors'
     | '/barber/$slug'
     | '/book/$slug'
     | '/celebrity/$slug'
+    | '/celebrity/new'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/affiliates'
     | '/bookings'
     | '/celebrities'
     | '/dashboard'
     | '/explore'
+    | '/sponsors'
     | '/barber/$slug'
     | '/book/$slug'
     | '/celebrity/$slug'
+    | '/celebrity/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AffiliatesRoute: typeof AffiliatesRoute
   BookingsRoute: typeof BookingsRoute
   CelebritiesRoute: typeof CelebritiesRoute
   DashboardRoute: typeof DashboardRoute
   ExploreRoute: typeof ExploreRoute
+  SponsorsRoute: typeof SponsorsRoute
   BarberSlugRoute: typeof BarberSlugRoute
   BookSlugRoute: typeof BookSlugRoute
   CelebritySlugRoute: typeof CelebritySlugRoute
+  CelebrityNewRoute: typeof CelebrityNewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -161,6 +200,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affiliates': {
+      id: '/affiliates'
+      path: '/affiliates'
+      fullPath: '/affiliates'
+      preLoaderRoute: typeof AffiliatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bookings': {
@@ -191,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sponsors': {
+      id: '/sponsors'
+      path: '/sponsors'
+      fullPath: '/sponsors'
+      preLoaderRoute: typeof SponsorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/barber/$slug': {
       id: '/barber/$slug'
       path: '/barber/$slug'
@@ -212,19 +265,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CelebritySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/celebrity/new': {
+      id: '/celebrity/new'
+      path: '/celebrity/new'
+      fullPath: '/celebrity/new'
+      preLoaderRoute: typeof CelebrityNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AffiliatesRoute: AffiliatesRoute,
   BookingsRoute: BookingsRoute,
   CelebritiesRoute: CelebritiesRoute,
   DashboardRoute: DashboardRoute,
   ExploreRoute: ExploreRoute,
+  SponsorsRoute: SponsorsRoute,
   BarberSlugRoute: BarberSlugRoute,
   BookSlugRoute: BookSlugRoute,
   CelebritySlugRoute: CelebritySlugRoute,
+  CelebrityNewRoute: CelebrityNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
