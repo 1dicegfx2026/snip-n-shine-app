@@ -381,7 +381,7 @@ export function nextNDates(n: number): { iso: string; weekday: string; day: stri
 }
 
 export function formatDateLong(iso: string): string {
-  const [y, m, d] = iso.split("-").map(Number);
+  const [y = 2026, m = 1, d = 1] = iso.split("-").map(Number);
   return new Date(y, m - 1, d).toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
