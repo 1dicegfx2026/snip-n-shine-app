@@ -1,0 +1,337 @@
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { ArrowLeft, ArrowRight, Check, CreditCard, ShieldCheck, PartyPopper } from "lucide-react";
+import { getBarber, getSlots, nextNDates, formatDateLong, DEPOSIT_RATE } from "@/lib/data/barbers";
+import { useBookings } from "@/lib/booking-store";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/book/$slug")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    service: typeof s.service === "string" ? s.service : "",
+    date: typeof s.date === "string" ? s.date : "",
+    time: typeof s.time === "string" ? s.time : "",
+  }),
+  loader: ({ params }) => {
+    const barber = getBarber(params.slug);
+    if (!barber) throw notFound();
+    return barber;
+  },
+  head: ({ loaderData }) => ({
+    meta: [
+      { title: `Book ${loaderData?.name ?? "appointment"} — GILT` },
+      { name: "description", content: "Reserve your chair with a secure deposit. Live availability, instant confirmation." },
+      { property: "og:title", content: `Book ${loaderData?.name ?? "appointment"} — GILT` },
+      { property: "og:description", content: "Reserve your chair with a secure deposit on GILT." },
+    ],
+  }),
+  component: BookingFlow,
+});
+
+function BookingFlow() {
+  const barber = Route.useLoaderData();
+  const search = Route.useSearch();
+  const navigate = useNavigate();
+  const { addBooking, bookedTimesFor } = useBookings();
+
+  const [serviceId, setServiceId] = useState(search.service);
+  const [dateISO, setDateISO] = useState(search.date);
+  const [time, setTime] = useState(search.time);
+  const [name, setName] = useState("");
+  const [payType, setPayType] = useState<"deposit" | "full">("deposit");
+  const [confirmed, setConfirmed] = useState(false);
+
+  const service = barber.services.find((s) => s.id === serviceId);
+  const days = useMemo(() => nextNDates(14), []);
+  const slots = dateISO ? getSlots(barber, dateISO, bookedTimesFor(barber.slug, dateISO)) : [];
+
+  const total = service?.price ?? 0;
+  const dueToday = payType === "deposit" ? Math.round(total * DEPOSIT_RATE) : total;
+
+  const canConfirm = Boolean(service && dateISO && time && name.trim());
+
+  if (confirmed && service) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-16 text-center sm:px-6">
+        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-primary">
+          <PartyPopper size={28} />
+        </span>
+        <h1 className="mt-6 font-display text-3xl font-extrabold">You're booked.</h1>
+        <p className="mt-3 text-muted-foreground">
+          {service.name} with {barber.name} on <b className="text-foreground">{formatDateLong(dateISO)}</b> at{" "}
+          <b className="text-foreground">{slots.find((s) => s.time === time)?.label ?? time}</b>.
+        </p>
+        <div className="mt-6 rounded-xl border border-gold/30 bg-card p-5 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Paid today ({payType === "deposit" ? "25% deposit" : "full"})</span>
+            <span className="font-bold text-gold">${dueToday}</span>
+          </div>
+          <div className="mt-2 flex justify-between">
+            <span className="text-muted-foreground">Due at the chair</span>
+            <span className="font-semibold">${total - dueToday}</span>
+          </div>
+        </div>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Reminders set: 24h before (email) and 2h before (SMS). Demo mode — no card was charged.
+        </p>
+        <div className="mt-8 flex justify-center gap-3">
+          <Link
+            to="/bookings"
+            className="rounded-xl bg-primary px-6 py-3 font-display text-sm font-bold text-primary-foreground hover:bg-primary/85"
+          >
+            View my bookings
+          </Link>
+          <Link
+            to="/explore"
+            search={{ q: "" }}
+            className="rounded-xl border border-border px-6 py-3 text-sm font-semibold hover:bg-accent"
+          >
+            Keep exploring
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <Link
+        to="/barber/$slug"
+        params={{ slug: barber.slug }}
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-gold"
+      >
+        <ArrowLeft size={15} /> {barber.name}
+      </Link>
+      <h1 className="mt-3 font-display text-3xl font-extrabold">
+        Book {barber.name.split(" ")[0]}'s chair
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {barber.shop} · {barber.neighborhood}
+      </p>
+
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
+        <div className="space-y-8">
+          {/* 1 — Service */}
+          <section>
+            <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+              <StepBadge n={1} done={Boolean(service)} /> Choose a service
+            </h2>
+            <div className="mt-3 grid gap-2">
+              {barber.services.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setServiceId(s.id)}
+                  className={`flex items-center justify-between rounded-xl border p-4 text-left transition-colors ${
+                    serviceId === s.id
+                      ? "border-gold bg-gold/10"
+                      : "border-border bg-card hover:border-muted-foreground/40"
+                  }`}
+                >
+                  <div>
+                    <p className="text-sm font-semibold">{s.name}</p>
+                    <p className="text-xs text-muted-foreground">{s.durationMin} min</p>
+                  </div>
+                  <span className="font-display font-bold text-gold">${s.price}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* 2 — Date */}
+          <section>
+            <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+              <StepBadge n={2} done={Boolean(dateISO)} /> Pick a day
+            </h2>
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+              {days.map((d) => (
+                <button
+                  key={d.iso}
+                  onClick={() => {
+                    setDateISO(d.iso);
+                    setTime("");
+                  }}
+                  className={`flex w-16 shrink-0 flex-col items-center rounded-xl border py-3 transition-colors ${
+                    dateISO === d.iso
+                      ? "border-gold bg-gold/10 text-gold"
+                      : "border-border bg-card hover:border-muted-foreground/40"
+                  }`}
+                >
+                  <span className="text-[11px] font-semibold uppercase text-muted-foreground">{d.weekday}</span>
+                  <span className="font-display text-xl font-bold">{d.day}</span>
+                  <span className="text-[11px] text-muted-foreground">{d.month}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* 3 — Time */}
+          {dateISO && (
+            <section>
+              <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+                <StepBadge n={3} done={Boolean(time)} /> Pick a time — {formatDateLong(dateISO)}
+              </h2>
+              <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                {slots.map((s) => (
+                  <button
+                    key={s.time}
+                    disabled={s.status === "booked"}
+                    onClick={() => setTime(s.time)}
+                    className={`rounded-lg border py-2.5 text-sm font-semibold transition-colors ${
+                      s.status === "booked"
+                        ? "cursor-not-allowed border-border bg-muted text-muted-foreground/50 line-through"
+                        : time === s.time
+                          ? "border-gold bg-gold text-gold-foreground"
+                          : "border-primary/40 bg-primary/10 text-primary hover:bg-primary/25"
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* 4 — Details & payment */}
+          {time && service && (
+            <section>
+              <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+                <StepBadge n={4} done={false} /> Your details & deposit
+              </h2>
+              <div className="mt-3 space-y-4 rounded-xl border border-border bg-card p-5">
+                <div>
+                  <label htmlFor="name" className="text-xs font-semibold text-muted-foreground">
+                    Full name
+                  </label>
+                  <input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Jordan Rivers"
+                    className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
+                  />
+                </div>
+
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <button
+                    onClick={() => setPayType("deposit")}
+                    className={`rounded-xl border p-4 text-left transition-colors ${
+                      payType === "deposit" ? "border-gold bg-gold/10" : "border-border hover:border-muted-foreground/40"
+                    }`}
+                  >
+                    <p className="text-sm font-bold">25% deposit — ${Math.round(total * DEPOSIT_RATE)}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Secures your slot. Pay the rest at the chair.
+                    </p>
+                  </button>
+                  <button
+                    onClick={() => setPayType("full")}
+                    className={`rounded-xl border p-4 text-left transition-colors ${
+                      payType === "full" ? "border-gold bg-gold/10" : "border-border hover:border-muted-foreground/40"
+                    }`}
+                  >
+                    <p className="text-sm font-bold">Pay in full — ${total}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Skip the counter entirely.</p>
+                  </button>
+                </div>
+
+                <div className="rounded-lg border border-dashed border-border bg-background p-4">
+                  <p className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                    <CreditCard size={14} /> Card details
+                  </p>
+                  <div className="mt-2 grid gap-2">
+                    <input
+                      placeholder="4242 4242 4242 4242"
+                      inputMode="numeric"
+                      className="rounded-lg border border-input bg-card px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        placeholder="MM / YY"
+                        className="rounded-lg border border-input bg-card px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
+                      />
+                      <input
+                        placeholder="CVC"
+                        inputMode="numeric"
+                        className="rounded-lg border border-input bg-card px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <ShieldCheck size={12} className="text-primary" /> Demo checkout — no real charge is made.
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Summary */}
+        <aside className="lg:sticky lg:top-24 lg:self-start">
+          <div className="rounded-xl border border-gold/30 bg-card p-5">
+            <h2 className="font-display text-lg font-bold">Summary</h2>
+            <div className="mt-4 space-y-2.5 text-sm">
+              <Row label="Pro" value={barber.name} />
+              <Row label="Service" value={service ? `${service.name} (${service.durationMin} min)` : "—"} />
+              <Row label="Date" value={dateISO ? formatDateLong(dateISO) : "—"} />
+              <Row
+                label="Time"
+                value={time ? (slots.find((s) => s.time === time)?.label ?? time) : "—"}
+              />
+              <div className="my-3 hairline-gold" />
+              <Row label="Total" value={`$${total}`} />
+              <div className="flex justify-between text-base">
+                <span className="font-semibold">Due today</span>
+                <span className="font-display font-extrabold text-gold">${dueToday}</span>
+              </div>
+            </div>
+            <button
+              disabled={!canConfirm}
+              onClick={() => {
+                if (!service) return;
+                addBooking({
+                  barberSlug: barber.slug,
+                  serviceId: service.id,
+                  dateISO,
+                  time,
+                  name: name.trim(),
+                  payType,
+                  amountPaid: dueToday,
+                  total,
+                });
+                setConfirmed(true);
+                toast.success("Appointment confirmed — see you in the chair.");
+                window.scrollTo({ top: 0 });
+              }}
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 font-display text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/85 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Confirm booking <ArrowRight size={16} />
+            </button>
+            <p className="mt-3 text-center text-[11px] text-muted-foreground">
+              Free cancellation up to 4h before. Reminders by email & SMS.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+function StepBadge({ n, done }: { n: number; done: boolean }) {
+  return (
+    <span
+      className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+        done ? "bg-gold text-gold-foreground" : "bg-muted text-muted-foreground"
+      }`}
+    >
+      {done ? <Check size={13} /> : n}
+    </span>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between gap-4">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="text-right font-semibold">{value}</span>
+    </div>
+  );
+}
