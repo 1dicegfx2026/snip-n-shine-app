@@ -134,6 +134,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <SiteProvider>
       <BookingProvider>
         <div className="flex min-h-screen flex-col">
           <Header />
