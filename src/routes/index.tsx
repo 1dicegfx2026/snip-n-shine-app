@@ -18,7 +18,9 @@ import {
 } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import { BARBERS, CATEGORIES } from "@/lib/data/barbers";
+import { CELEBRITIES, formatFollowers } from "@/lib/data/celebrities";
 import { BarberCard } from "@/components/BarberCard";
+import { HeroSlider } from "@/components/HeroSlider";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -57,6 +59,8 @@ function HomePage() {
 
   return (
     <div>
+      <HeroSlider />
+
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
