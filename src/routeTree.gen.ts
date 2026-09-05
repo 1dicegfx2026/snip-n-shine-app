@@ -12,10 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BookingsRouteImport } from './routes/bookings'
+import { Route as CelebritiesRouteImport } from './routes/celebrities'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as BarberSlugRouteImport } from './routes/barber.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
+import { Route as CelebritySlugRouteImport } from './routes/celebrity.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,6 +32,11 @@ const AdminRoute = AdminRouteImport.update({
 const BookingsRoute = BookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CelebritiesRoute = CelebritiesRouteImport.update({
+  id: '/celebrities',
+  path: '/celebrities',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -52,34 +59,45 @@ const BookSlugRoute = BookSlugRouteImport.update({
   path: '/book/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CelebritySlugRoute = CelebritySlugRouteImport.update({
+  id: '/celebrity/$slug',
+  path: '/celebrity/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/bookings': typeof BookingsRoute
+  '/celebrities': typeof CelebritiesRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/barber/$slug': typeof BarberSlugRoute
   '/book/$slug': typeof BookSlugRoute
+  '/celebrity/$slug': typeof CelebritySlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/bookings': typeof BookingsRoute
+  '/celebrities': typeof CelebritiesRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/barber/$slug': typeof BarberSlugRoute
   '/book/$slug': typeof BookSlugRoute
+  '/celebrity/$slug': typeof CelebritySlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/bookings': typeof BookingsRoute
+  '/celebrities': typeof CelebritiesRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/barber/$slug': typeof BarberSlugRoute
   '/book/$slug': typeof BookSlugRoute
+  '/celebrity/$slug': typeof CelebritySlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,38 +105,46 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/bookings'
+    | '/celebrities'
     | '/dashboard'
     | '/explore'
     | '/barber/$slug'
     | '/book/$slug'
+    | '/celebrity/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/bookings'
+    | '/celebrities'
     | '/dashboard'
     | '/explore'
     | '/barber/$slug'
     | '/book/$slug'
+    | '/celebrity/$slug'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/bookings'
+    | '/celebrities'
     | '/dashboard'
     | '/explore'
     | '/barber/$slug'
     | '/book/$slug'
+    | '/celebrity/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   BookingsRoute: typeof BookingsRoute
+  CelebritiesRoute: typeof CelebritiesRoute
   DashboardRoute: typeof DashboardRoute
   ExploreRoute: typeof ExploreRoute
   BarberSlugRoute: typeof BarberSlugRoute
   BookSlugRoute: typeof BookSlugRoute
+  CelebritySlugRoute: typeof CelebritySlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -142,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/bookings'
       fullPath: '/bookings'
       preLoaderRoute: typeof BookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/celebrities': {
+      id: '/celebrities'
+      path: '/celebrities'
+      fullPath: '/celebrities'
+      preLoaderRoute: typeof CelebritiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -172,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/celebrity/$slug': {
+      id: '/celebrity/$slug'
+      path: '/celebrity/$slug'
+      fullPath: '/celebrity/$slug'
+      preLoaderRoute: typeof CelebritySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -179,10 +219,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   BookingsRoute: BookingsRoute,
+  CelebritiesRoute: CelebritiesRoute,
   DashboardRoute: DashboardRoute,
   ExploreRoute: ExploreRoute,
   BarberSlugRoute: BarberSlugRoute,
   BookSlugRoute: BookSlugRoute,
+  CelebritySlugRoute: CelebritySlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
