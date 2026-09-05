@@ -180,6 +180,40 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Celebrity artists */}
+      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold tracking-[0.25em] text-gold">GILT CELEBRITY</p>
+            <h2 className="mt-2 font-display text-3xl font-bold">Appointment directo con los artistas</h2>
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+              Meet & greets, sesiones y cortes en cámara con las figuras de la cultura. Cada uno con
+              su propio perfil, a su estilo.
+            </p>
+          </div>
+          <Link
+            to="/celebrities"
+            className="flex items-center gap-1.5 text-sm font-semibold text-gold hover:underline"
+          >
+            Ver todos <ArrowRight size={15} />
+          </Link>
+        </div>
+        <div className="mt-8 grid gap-5 sm:grid-cols-3">
+          {CELEBRITIES.map((c) => (
+            <Link key={c.slug} to="/celebrity/$slug" params={{ slug: c.slug }} className="card-luxe overflow-hidden">
+              <img src={c.avatar} alt={c.name} loading="lazy" className="h-48 w-full object-cover" />
+              <div className="p-5">
+                <p className="font-display text-lg font-bold">{c.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {c.role} · {formatFollowers(c.followers)} fans
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">{c.tagline}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* How it works */}
       <section className="border-y border-border bg-card/40">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
