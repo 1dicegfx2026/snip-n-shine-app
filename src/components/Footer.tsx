@@ -24,21 +24,22 @@ export function Footer() {
               <ul className="mt-3 space-y-2 text-muted-foreground">
                 <li><Link to="/explore" search={{ q: "" }} className="hover:text-gold">Find a barber</Link></li>
                 <li><Link to="/bookings" className="hover:text-gold">My bookings</Link></li>
-                <li><Link to="/explore" search={{ q: "fades" }} className="hover:text-gold">Top fades</Link></li>
+                <li><Link to="/celebrities" className="hover:text-gold">Artistas celebrity</Link></li>
               </ul>
             </div>
             <div>
               <p className="font-display font-semibold text-foreground">Professionals</p>
               <ul className="mt-3 space-y-2 text-muted-foreground">
                 <li><Link to="/dashboard" className="hover:text-gold">Pro dashboard</Link></li>
-                <li><Link to="/dashboard" className="hover:text-gold">List your chair</Link></li>
+                <li><Link to="/celebrity/new" className="hover:text-gold">Crear perfil de artista</Link></li>
+                <li><Link to="/admin" className="hover:text-gold">Admin & video</Link></li>
               </ul>
             </div>
             <div>
-              <p className="font-display font-semibold text-foreground">Company</p>
+              <p className="font-display font-semibold text-foreground">Partners</p>
               <ul className="mt-3 space-y-2 text-muted-foreground">
-                <li><span className="cursor-pointer hover:text-gold">About</span></li>
-                <li><span className="cursor-pointer hover:text-gold">Careers</span></li>
+                <li><Link to="/affiliates" className="hover:text-gold">Afiliados</Link></li>
+                <li><Link to="/sponsors" className="hover:text-gold">Sponsors</Link></li>
                 <li><span className="cursor-pointer hover:text-gold">Press</span></li>
               </ul>
             </div>
