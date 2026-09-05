@@ -134,14 +134,18 @@ function HomePage() {
           </div>
         </div>
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {CATEGORIES.map((c) => (
+          {CATEGORIES.map((c) => {
+            const Icon = CATEGORY_ICONS[c.name] ?? Scissors;
+            return (
             <Link
               key={c.name}
               to="/explore"
               search={{ q: c.name.toLowerCase() }}
               className="card-luxe p-5"
             >
-              <span className="text-2xl">{CATEGORY_ICONS[c.name]}</span>
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold/10 text-gold">
+                <Icon size={20} />
+              </span>
               <p className="mt-3 font-display font-bold">{c.name}</p>
               <p className="mt-1 text-xs text-muted-foreground">{c.blurb}</p>
             </Link>
