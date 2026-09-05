@@ -1,6 +1,21 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, MapPin, CalendarCheck, ShieldCheck, Sparkles, ArrowRight } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  CalendarCheck,
+  ShieldCheck,
+  Sparkles,
+  ArrowRight,
+  Scissors,
+  Zap,
+  Brush,
+  Crown,
+  Palette,
+  Slice,
+  Hand,
+  type LucideIcon,
+} from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
 import { BARBERS, CATEGORIES } from "@/lib/data/barbers";
 import { BarberCard } from "@/components/BarberCard";
@@ -24,15 +39,15 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const CATEGORY_ICONS: Record<string, string> = {
-  Cuts: "✂️",
-  Fades: "⚡",
-  Beard: "🪒",
-  Braids: "👑",
-  Color: "🎨",
-  Shave: "🗡️",
-  Nails: "💅",
-  Styling: "✨",
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  Cuts: Scissors,
+  Fades: Zap,
+  Beard: Brush,
+  Braids: Crown,
+  Color: Palette,
+  Shave: Slice,
+  Nails: Hand,
+  Styling: Sparkles,
 };
 
 function HomePage() {
