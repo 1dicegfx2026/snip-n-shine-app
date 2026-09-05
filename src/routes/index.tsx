@@ -149,7 +149,8 @@ function HomePage() {
               <p className="mt-3 font-display font-bold">{c.name}</p>
               <p className="mt-1 text-xs text-muted-foreground">{c.blurb}</p>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </section>
 
