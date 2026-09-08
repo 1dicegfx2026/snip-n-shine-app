@@ -17,6 +17,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
+import founderImg from "@/assets/founder.jpg";
 import { BARBERS, CATEGORIES } from "@/lib/data/barbers";
 import { CELEBRITIES, formatFollowers } from "@/lib/data/celebrities";
 import { BarberCard } from "@/components/BarberCard";
@@ -286,6 +287,7 @@ function HomePage() {
             </ul>
             <Link
               to="/pro/new"
+              search={{ edit: "" }}
               className="mt-8 inline-flex items-center gap-2 rounded-xl border border-gold/40 px-6 py-3 font-display text-sm font-bold text-gold transition-colors hover:bg-gold/10"
             >
               Crear mi página <ArrowRight size={16} />
