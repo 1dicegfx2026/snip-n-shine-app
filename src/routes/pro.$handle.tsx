@@ -1,10 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import {
-  Instagram,
-  Youtube,
-  Facebook,
-  Music2,
-  Globe,
   BadgeCheck,
   CalendarDays,
   Radio,
@@ -12,6 +7,8 @@ import {
   Download,
 } from "lucide-react";
 import { useState } from "react";
+import { SocialPills, SocialConnect } from "@/components/SocialConnect";
+import { SponsorBanner } from "@/components/SponsorBanner";
 import { usePros } from "@/lib/pro-store";
 import { planOf, type ProPage } from "@/lib/data/pro-pages";
 import { SEED_PRO_PAGES } from "@/lib/data/pro-pages";
