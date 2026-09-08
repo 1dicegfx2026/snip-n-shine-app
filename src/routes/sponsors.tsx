@@ -57,6 +57,22 @@ function SponsorsPage() {
         y sigue a sus artistas favoritos.
       </p>
 
+      <a
+        href="https://www.sharp47.com/products/sharp-47-clipper-and-trimmers"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-6 flex items-center justify-between gap-4 rounded-2xl border border-gold/30 bg-gradient-to-r from-gold/10 to-transparent p-5 transition-colors hover:border-gold/60"
+      >
+        <div>
+          <p className="text-xs font-bold tracking-[0.2em] text-gold">SPONSOR DESTACADO</p>
+          <p className="mt-1 font-display text-xl font-bold">Sharp47</p>
+          <p className="text-sm text-muted-foreground">Clipper & trimmers diseñados para el trabajo profesional.</p>
+        </div>
+        <span className="shrink-0 rounded-xl bg-gold px-4 py-2 font-display text-xs font-bold text-gold-foreground">
+          Ver productos
+        </span>
+      </a>
+
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         {[
           { icon: Megaphone, title: "Video en portada", text: "Tu anuncio en el slider que ve todo el mundo al entrar." },
