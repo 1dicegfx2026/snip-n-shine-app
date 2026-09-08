@@ -34,7 +34,7 @@ function BookingFlow() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { addBooking, bookedTimesFor, depositRateFor } = useBookings();
-  const depositRate = depositRateFor(params.slug);
+  const depositRate = depositRateFor(barber.slug);
 
   const [serviceId, setServiceId] = useState(search.service);
   const [dateISO, setDateISO] = useState(search.date);
@@ -221,7 +221,7 @@ function BookingFlow() {
                       payType === "deposit" ? "border-gold bg-gold/10" : "border-border hover:border-muted-foreground/40"
                     }`}
                   >
-                    <p className="text-sm font-bold">25% deposit — ${Math.round(total * DEPOSIT_RATE)}</p>
+                    <p className="text-sm font-bold">{Math.round(depositRate * 100)}% deposit — ${Math.round(total * depositRate)}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       Secures your slot. Pay the rest at the chair.
                     </p>
