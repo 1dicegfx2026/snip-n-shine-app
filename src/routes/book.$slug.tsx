@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CreditCard, ShieldCheck, PartyPopper } from "lucide-react";
-import { getBarber, getSlots, nextNDates, formatDateLong, DEPOSIT_RATE } from "@/lib/data/barbers";
+import { getBarber, getSlots, nextNDates, formatDateLong } from "@/lib/data/barbers";
+import { BASE_COMMISSION } from "@/lib/data/pro-pages";
 import { useBookings } from "@/lib/booking-store";
 import { PAY_METHODS, type PayMethod } from "@/lib/site-store";
 import { toast } from "sonner";
@@ -32,7 +33,8 @@ function BookingFlow() {
   const barber = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { addBooking, bookedTimesFor } = useBookings();
+  const { addBooking, bookedTimesFor, depositRateFor } = useBookings();
+  const depositRate = depositRateFor(barber.slug);
 
   const [serviceId, setServiceId] = useState(search.service);
   const [dateISO, setDateISO] = useState(search.date);
@@ -47,7 +49,7 @@ function BookingFlow() {
   const slots = dateISO ? getSlots(barber, dateISO, bookedTimesFor(barber.slug, dateISO)) : [];
 
   const total = service?.price ?? 0;
-  const dueToday = payType === "deposit" ? Math.round(total * DEPOSIT_RATE) : total;
+  const dueToday = payType === "deposit" ? Math.round(total * depositRate) : total;
 
   const canConfirm = Boolean(service && dateISO && time && name.trim());
 
@@ -64,7 +66,7 @@ function BookingFlow() {
         </p>
         <div className="mt-6 rounded-xl border border-gold/30 bg-card p-5 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Paid today ({payType === "deposit" ? "25% deposit" : "full"})</span>
+            <span className="text-muted-foreground">Paid today ({payType === "deposit" ? `${Math.round(depositRate * 100)}% deposit` : "full"})</span>
             <span className="font-bold text-gold">${dueToday}</span>
           </div>
           <div className="mt-2 flex justify-between">
@@ -219,7 +221,7 @@ function BookingFlow() {
                       payType === "deposit" ? "border-gold bg-gold/10" : "border-border hover:border-muted-foreground/40"
                     }`}
                   >
-                    <p className="text-sm font-bold">25% deposit — ${Math.round(total * DEPOSIT_RATE)}</p>
+                    <p className="text-sm font-bold">{Math.round(depositRate * 100)}% deposit — ${Math.round(total * depositRate)}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       Secures your slot. Pay the rest at the chair.
                     </p>
@@ -321,6 +323,8 @@ function BookingFlow() {
                   payType,
                   payMethod,
                   amountPaid: dueToday,
+                  depositRate,
+                  commissionRate: BASE_COMMISSION,
                   total,
                 });
                 setConfirmed(true);

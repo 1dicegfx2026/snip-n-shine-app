@@ -338,7 +338,7 @@ function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="relative overflow-hidden rounded-2xl border border-gold/30 bg-gradient-to-br from-emerald-deep via-card to-background p-8 sm:p-12">
           <div className="max-w-xl">
-            <p className="text-xs font-bold tracking-[0.25em] text-gold">BUSINESS TOOLS</p>
+            <p className="text-xs font-bold tracking-[0.25em] text-gold">BARBEROS PREMIUM</p>
             <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">
               Fill your chair. Keep your no-shows at zero.
             </h2>
@@ -350,7 +350,7 @@ function HomePage() {
               to="/dashboard"
               className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gold px-6 py-3 font-display text-sm font-bold text-gold-foreground transition-colors hover:bg-gold/90"
             >
-              Open business dashboard <ArrowRight size={16} />
+              Abrir panel Barberos Premium <ArrowRight size={16} />
             </Link>
           </div>
         </div>

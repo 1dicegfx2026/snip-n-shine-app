@@ -41,7 +41,7 @@ export const PLANS: Plan[] = [
     commission: 0.08,
     perks: [
       "Todo lo del Básico",
-      "Clases en vivo con cobro por entrada",
+      "Clases con cobro por entrada",
       "Perfil destacado en Explore",
       "Redes conectadas (TikTok, IG, YouTube, Facebook)",
       "8% de comisión por corte",
@@ -58,6 +58,7 @@ export const PLANS: Plan[] = [
       "Banners de sponsors en tu página (te quedas el 100%)",
       "Portada e historias en la home",
       "Importación de clientes desde Booksy y otras apps",
+      "Transmisión en vivo desde la app (solo Elite)",
       "5% de comisión por corte",
     ],
   },
