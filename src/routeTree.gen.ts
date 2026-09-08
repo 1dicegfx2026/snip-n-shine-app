@@ -24,6 +24,7 @@ import { Route as BookSlugRouteImport } from './routes/book.$slug'
 import { Route as CelebritySlugRouteImport } from './routes/celebrity.$slug'
 import { Route as CelebrityNewRouteImport } from './routes/celebrity.new'
 import { Route as ProHandleRouteImport } from './routes/pro.$handle'
+import { Route as ProNewRouteImport } from './routes/pro.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -100,6 +101,11 @@ const ProHandleRoute = ProHandleRouteImport.update({
   path: '/pro/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProNewRoute = ProNewRouteImport.update({
+  id: '/pro/new',
+  path: '/pro/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/celebrity/$slug': typeof CelebritySlugRoute
   '/celebrity/new': typeof CelebrityNewRoute
   '/pro/$handle': typeof ProHandleRoute
+  '/pro/new': typeof ProNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/celebrity/$slug': typeof CelebritySlugRoute
   '/celebrity/new': typeof CelebrityNewRoute
   '/pro/$handle': typeof ProHandleRoute
+  '/pro/new': typeof ProNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/celebrity/$slug': typeof CelebritySlugRoute
   '/celebrity/new': typeof CelebrityNewRoute
   '/pro/$handle': typeof ProHandleRoute
+  '/pro/new': typeof ProNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/celebrity/$slug'
     | '/celebrity/new'
     | '/pro/$handle'
+    | '/pro/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/celebrity/$slug'
     | '/celebrity/new'
     | '/pro/$handle'
+    | '/pro/new'
   id:
     | '__root__'
     | '/'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/celebrity/$slug'
     | '/celebrity/new'
     | '/pro/$handle'
+    | '/pro/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -223,6 +235,7 @@ export interface RootRouteChildren {
   CelebritySlugRoute: typeof CelebritySlugRoute
   CelebrityNewRoute: typeof CelebrityNewRoute
   ProHandleRoute: typeof ProHandleRoute
+  ProNewRoute: typeof ProNewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -332,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProHandleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pro/new': {
+      id: '/pro/new'
+      path: '/pro/new'
+      fullPath: '/pro/new'
+      preLoaderRoute: typeof ProNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -351,6 +371,7 @@ const rootRouteChildren: RootRouteChildren = {
   CelebritySlugRoute: CelebritySlugRoute,
   CelebrityNewRoute: CelebrityNewRoute,
   ProHandleRoute: ProHandleRoute,
+  ProNewRoute: ProNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

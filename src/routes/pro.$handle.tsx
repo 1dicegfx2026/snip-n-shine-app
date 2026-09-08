@@ -112,6 +112,8 @@ function ProPageView() {
               <Link
                 to="/book/$slug"
                 params={{ slug: page.barberSlug }}
+                search={{ service: "", date: "", time: "" }}
+
                 className="inline-flex items-center gap-2 rounded-xl bg-gold px-5 py-3 font-display text-sm font-bold text-gold-foreground hover:bg-gold/90"
               >
                 <CalendarDays size={16} /> Reservar
