@@ -17,6 +17,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import heroImg from "@/assets/hero.jpg";
+import founderImg from "@/assets/founder.jpg";
 import { BARBERS, CATEGORIES } from "@/lib/data/barbers";
 import { CELEBRITIES, formatFollowers } from "@/lib/data/celebrities";
 import { BarberCard } from "@/components/BarberCard";
@@ -247,7 +248,56 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Founder / creator */}
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+        <div className="grid items-center gap-10 md:grid-cols-2">
+          <div className="relative overflow-hidden rounded-2xl border border-gold/30">
+            <img
+              src={founderImg}
+              alt="Founder and creator of GILT wearing the GILT logo jacket"
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
+            <span className="absolute bottom-4 left-4 rounded-full border border-gold/40 bg-background/70 px-3 py-1 text-xs font-bold tracking-[0.2em] text-gold backdrop-blur">
+              FOUNDER
+            </span>
+          </div>
+          <div>
+            <p className="text-xs font-bold tracking-[0.25em] text-gold">EL CREADOR</p>
+            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">
+              Built by someone who lives the chair
+            </h2>
+            <p className="mt-4 leading-relaxed text-muted-foreground">
+              GILT nació en la barbería, no en una oficina. La idea es simple: darle a cada barbero
+              y estilista su propia página, sus clientes, sus clases y su dinero — sin que una app
+              se quede con el control de su nombre.
+            </p>
+            <ul className="mt-6 space-y-3 text-sm text-muted-foreground">
+              {[
+                "Página personal para cada pro, con su trabajo por categorías",
+                "Clases en vivo y clientes que se traen de otras plataformas",
+                "Sponsors, afiliados y membresías que pagan de verdad",
+              ].map((t) => (
+                <li key={t} className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <Link
+              to="/pro/new"
+              search={{ edit: "" }}
+              className="mt-8 inline-flex items-center gap-2 rounded-xl border border-gold/40 px-6 py-3 font-display text-sm font-bold text-gold transition-colors hover:bg-gold/10"
+            >
+              Crear mi página <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Pro CTA */}
+
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="relative overflow-hidden rounded-2xl border border-gold/30 bg-gradient-to-br from-emerald-deep via-card to-background p-8 sm:p-12">
           <div className="max-w-xl">
