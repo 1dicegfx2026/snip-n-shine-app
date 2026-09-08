@@ -39,14 +39,6 @@ export const Route = createFileRoute("/pro/$handle")({
   component: ProPageView,
 });
 
-const SOCIALS = [
-  { key: "tiktok", label: "TikTok", icon: Music2 },
-  { key: "instagram", label: "Instagram", icon: Instagram },
-  { key: "youtube", label: "YouTube", icon: Youtube },
-  { key: "facebook", label: "Facebook", icon: Facebook },
-  { key: "website", label: "Web", icon: Globe },
-] as const;
-
 function ProPageView() {
   const { handle } = Route.useParams();
   const { getPage, hydrated } = usePros();
@@ -137,6 +129,8 @@ function ProPageView() {
               <h2 className="font-display text-lg font-bold">Sobre mí</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{page.bio}</p>
             </section>
+
+            <SocialConnect socials={page.socials} />
 
             <section>
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -262,6 +256,8 @@ function ProPageView() {
                 </div>
               </a>
             ))}
+
+            <SponsorBanner />
 
             <Link
               to="/sponsors"
