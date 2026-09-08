@@ -321,6 +321,8 @@ function BookingFlow() {
                   payType,
                   payMethod,
                   amountPaid: dueToday,
+                  depositRate,
+                  commissionRate: BASE_COMMISSION,
                   total,
                 });
                 setConfirmed(true);
