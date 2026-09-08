@@ -130,22 +130,8 @@ function ProPageView() {
           </div>
         </div>
 
-        <div className="mt-5 flex flex-wrap gap-2">
-          {SOCIALS.map(({ key, label, icon: Icon }) => {
-            const url = page.socials[key];
-            if (!url) return null;
-            return (
-              <a
-                key={key}
-                href={url}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-gold"
-              >
-                <Icon size={14} /> {label}
-              </a>
-            );
-          })}
+        <div className="mt-5">
+          <SocialPills socials={page.socials} />
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
