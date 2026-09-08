@@ -82,8 +82,9 @@ function ProPageView() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
       </div>
 
-      <div className="mx-auto -mt-16 max-w-6xl px-4 sm:px-6">
+      <div className="relative z-10 mx-auto -mt-10 max-w-6xl px-4 sm:px-6">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
+
           <img
             src={page.avatarUrl}
             alt={page.name}
