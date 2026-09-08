@@ -32,6 +32,13 @@ export function Header() {
             Explore
           </Link>
           <Link
+            to="/pros"
+            className="rounded-lg px-2.5 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground sm:px-3"
+            activeProps={{ className: "text-gold hover:text-gold" }}
+          >
+            Pros
+          </Link>
+          <Link
             to="/celebrities"
             className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground sm:px-3"
             activeProps={{ className: "text-gold hover:text-gold" }}
@@ -39,6 +46,7 @@ export function Header() {
             <Star size={16} />
             <span className="hidden sm:inline">Celebrity</span>
           </Link>
+
           <Link
             to="/bookings"
             className="relative flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground sm:px-3"
