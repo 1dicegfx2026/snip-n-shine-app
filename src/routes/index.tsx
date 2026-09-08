@@ -22,6 +22,7 @@ import { BARBERS, CATEGORIES } from "@/lib/data/barbers";
 import { CELEBRITIES, formatFollowers } from "@/lib/data/celebrities";
 import { BarberCard } from "@/components/BarberCard";
 import { HeroSlider } from "@/components/HeroSlider";
+import { SponsorBanner } from "@/components/SponsorBanner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
