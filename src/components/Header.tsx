@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CalendarDays, LayoutDashboard, Star } from "lucide-react";
+import { CalendarDays, ExternalLink, LayoutDashboard, Star } from "lucide-react";
 import { useBookings } from "@/lib/booking-store";
 
 export function Header() {
@@ -67,6 +67,16 @@ export function Header() {
             <span className="hidden sm:inline">Business</span>
           </Link>
         </nav>
+
+        <a
+          href="https://www.sharp47.com/products/sharp-47-clipper-and-trimmers"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-bold text-gold transition-colors hover:bg-gold/20 md:flex"
+        >
+          Sponsor <span className="text-foreground">Sharp47</span>
+          <ExternalLink size={12} />
+        </a>
       </div>
     </header>
   );
