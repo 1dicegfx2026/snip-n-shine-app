@@ -1,10 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import {
-  Instagram,
-  Youtube,
-  Facebook,
-  Music2,
-  Globe,
   BadgeCheck,
   CalendarDays,
   Radio,
@@ -12,6 +7,8 @@ import {
   Download,
 } from "lucide-react";
 import { useState } from "react";
+import { SocialPills, SocialConnect } from "@/components/SocialConnect";
+import { SponsorBanner } from "@/components/SponsorBanner";
 import { usePros } from "@/lib/pro-store";
 import { planOf, type ProPage } from "@/lib/data/pro-pages";
 import { SEED_PRO_PAGES } from "@/lib/data/pro-pages";
@@ -41,14 +38,6 @@ export const Route = createFileRoute("/pro/$handle")({
   },
   component: ProPageView,
 });
-
-const SOCIALS = [
-  { key: "tiktok", label: "TikTok", icon: Music2 },
-  { key: "instagram", label: "Instagram", icon: Instagram },
-  { key: "youtube", label: "YouTube", icon: Youtube },
-  { key: "facebook", label: "Facebook", icon: Facebook },
-  { key: "website", label: "Web", icon: Globe },
-] as const;
 
 function ProPageView() {
   const { handle } = Route.useParams();
@@ -130,22 +119,8 @@ function ProPageView() {
           </div>
         </div>
 
-        <div className="mt-5 flex flex-wrap gap-2">
-          {SOCIALS.map(({ key, label, icon: Icon }) => {
-            const url = page.socials[key];
-            if (!url) return null;
-            return (
-              <a
-                key={key}
-                href={url}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-gold"
-              >
-                <Icon size={14} /> {label}
-              </a>
-            );
-          })}
+        <div className="mt-5">
+          <SocialPills socials={page.socials} />
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
@@ -154,6 +129,8 @@ function ProPageView() {
               <h2 className="font-display text-lg font-bold">Sobre mí</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{page.bio}</p>
             </section>
+
+            <SocialConnect socials={page.socials} />
 
             <section>
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -279,6 +256,8 @@ function ProPageView() {
                 </div>
               </a>
             ))}
+
+            <SponsorBanner />
 
             <Link
               to="/sponsors"

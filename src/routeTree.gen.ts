@@ -14,6 +14,8 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AffiliatesRouteImport } from './routes/affiliates'
 import { Route as BookingsRouteImport } from './routes/bookings'
 import { Route as CelebritiesRouteImport } from './routes/celebrities'
+import { Route as ClassesRouteImport } from './routes/classes'
+import { Route as CommunityRouteImport } from './routes/community'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -25,6 +27,8 @@ import { Route as CelebritySlugRouteImport } from './routes/celebrity.$slug'
 import { Route as CelebrityNewRouteImport } from './routes/celebrity.new'
 import { Route as ProHandleRouteImport } from './routes/pro.$handle'
 import { Route as ProNewRouteImport } from './routes/pro.new'
+import { Route as UHandleRouteImport } from './routes/u.$handle'
+import { Route as UNewRouteImport } from './routes/u.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -49,6 +53,16 @@ const BookingsRoute = BookingsRouteImport.update({
 const CelebritiesRoute = CelebritiesRouteImport.update({
   id: '/celebrities',
   path: '/celebrities',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClassesRoute = ClassesRouteImport.update({
+  id: '/classes',
+  path: '/classes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -106,6 +120,16 @@ const ProNewRoute = ProNewRouteImport.update({
   path: '/pro/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UHandleRoute = UHandleRouteImport.update({
+  id: '/u/$handle',
+  path: '/u/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UNewRoute = UNewRouteImport.update({
+  id: '/u/new',
+  path: '/u/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -113,6 +137,8 @@ export interface FileRoutesByFullPath {
   '/affiliates': typeof AffiliatesRoute
   '/bookings': typeof BookingsRoute
   '/celebrities': typeof CelebritiesRoute
+  '/classes': typeof ClassesRoute
+  '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/pricing': typeof PricingRoute
@@ -124,6 +150,8 @@ export interface FileRoutesByFullPath {
   '/celebrity/new': typeof CelebrityNewRoute
   '/pro/$handle': typeof ProHandleRoute
   '/pro/new': typeof ProNewRoute
+  '/u/$handle': typeof UHandleRoute
+  '/u/new': typeof UNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -131,6 +159,8 @@ export interface FileRoutesByTo {
   '/affiliates': typeof AffiliatesRoute
   '/bookings': typeof BookingsRoute
   '/celebrities': typeof CelebritiesRoute
+  '/classes': typeof ClassesRoute
+  '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/pricing': typeof PricingRoute
@@ -142,6 +172,8 @@ export interface FileRoutesByTo {
   '/celebrity/new': typeof CelebrityNewRoute
   '/pro/$handle': typeof ProHandleRoute
   '/pro/new': typeof ProNewRoute
+  '/u/$handle': typeof UHandleRoute
+  '/u/new': typeof UNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,6 +182,8 @@ export interface FileRoutesById {
   '/affiliates': typeof AffiliatesRoute
   '/bookings': typeof BookingsRoute
   '/celebrities': typeof CelebritiesRoute
+  '/classes': typeof ClassesRoute
+  '/community': typeof CommunityRoute
   '/dashboard': typeof DashboardRoute
   '/explore': typeof ExploreRoute
   '/pricing': typeof PricingRoute
@@ -161,6 +195,8 @@ export interface FileRoutesById {
   '/celebrity/new': typeof CelebrityNewRoute
   '/pro/$handle': typeof ProHandleRoute
   '/pro/new': typeof ProNewRoute
+  '/u/$handle': typeof UHandleRoute
+  '/u/new': typeof UNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -170,6 +206,8 @@ export interface FileRouteTypes {
     | '/affiliates'
     | '/bookings'
     | '/celebrities'
+    | '/classes'
+    | '/community'
     | '/dashboard'
     | '/explore'
     | '/pricing'
@@ -181,6 +219,8 @@ export interface FileRouteTypes {
     | '/celebrity/new'
     | '/pro/$handle'
     | '/pro/new'
+    | '/u/$handle'
+    | '/u/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +228,8 @@ export interface FileRouteTypes {
     | '/affiliates'
     | '/bookings'
     | '/celebrities'
+    | '/classes'
+    | '/community'
     | '/dashboard'
     | '/explore'
     | '/pricing'
@@ -199,6 +241,8 @@ export interface FileRouteTypes {
     | '/celebrity/new'
     | '/pro/$handle'
     | '/pro/new'
+    | '/u/$handle'
+    | '/u/new'
   id:
     | '__root__'
     | '/'
@@ -206,6 +250,8 @@ export interface FileRouteTypes {
     | '/affiliates'
     | '/bookings'
     | '/celebrities'
+    | '/classes'
+    | '/community'
     | '/dashboard'
     | '/explore'
     | '/pricing'
@@ -217,6 +263,8 @@ export interface FileRouteTypes {
     | '/celebrity/new'
     | '/pro/$handle'
     | '/pro/new'
+    | '/u/$handle'
+    | '/u/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -225,6 +273,8 @@ export interface RootRouteChildren {
   AffiliatesRoute: typeof AffiliatesRoute
   BookingsRoute: typeof BookingsRoute
   CelebritiesRoute: typeof CelebritiesRoute
+  ClassesRoute: typeof ClassesRoute
+  CommunityRoute: typeof CommunityRoute
   DashboardRoute: typeof DashboardRoute
   ExploreRoute: typeof ExploreRoute
   PricingRoute: typeof PricingRoute
@@ -236,6 +286,8 @@ export interface RootRouteChildren {
   CelebrityNewRoute: typeof CelebrityNewRoute
   ProHandleRoute: typeof ProHandleRoute
   ProNewRoute: typeof ProNewRoute
+  UHandleRoute: typeof UHandleRoute
+  UNewRoute: typeof UNewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -273,6 +325,20 @@ declare module '@tanstack/react-router' {
       path: '/celebrities'
       fullPath: '/celebrities'
       preLoaderRoute: typeof CelebritiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/classes': {
+      id: '/classes'
+      path: '/classes'
+      fullPath: '/classes'
+      preLoaderRoute: typeof ClassesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -352,6 +418,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/u/$handle': {
+      id: '/u/$handle'
+      path: '/u/$handle'
+      fullPath: '/u/$handle'
+      preLoaderRoute: typeof UHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/u/new': {
+      id: '/u/new'
+      path: '/u/new'
+      fullPath: '/u/new'
+      preLoaderRoute: typeof UNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -361,6 +441,8 @@ const rootRouteChildren: RootRouteChildren = {
   AffiliatesRoute: AffiliatesRoute,
   BookingsRoute: BookingsRoute,
   CelebritiesRoute: CelebritiesRoute,
+  ClassesRoute: ClassesRoute,
+  CommunityRoute: CommunityRoute,
   DashboardRoute: DashboardRoute,
   ExploreRoute: ExploreRoute,
   PricingRoute: PricingRoute,
@@ -372,6 +454,8 @@ const rootRouteChildren: RootRouteChildren = {
   CelebrityNewRoute: CelebrityNewRoute,
   ProHandleRoute: ProHandleRoute,
   ProNewRoute: ProNewRoute,
+  UHandleRoute: UHandleRoute,
+  UNewRoute: UNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

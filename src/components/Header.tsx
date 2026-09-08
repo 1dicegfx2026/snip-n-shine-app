@@ -37,6 +37,20 @@ export function Header() {
             Pros
           </Link>
           <Link
+            to="/classes"
+            className="hidden rounded-lg px-2.5 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground sm:block sm:px-3"
+            activeProps={{ className: "text-gold hover:text-gold" }}
+          >
+            Clases
+          </Link>
+          <Link
+            to="/community"
+            className="hidden rounded-lg px-2.5 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground sm:block sm:px-3"
+            activeProps={{ className: "text-gold hover:text-gold" }}
+          >
+            Comunidad
+          </Link>
+          <Link
             to="/celebrities"
             className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground sm:px-3"
             activeProps={{ className: "text-gold hover:text-gold" }}

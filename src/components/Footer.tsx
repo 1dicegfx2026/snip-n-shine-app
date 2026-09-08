@@ -25,6 +25,9 @@ export function Footer() {
                 <li><Link to="/explore" search={{ q: "" }} className="hover:text-gold">Find a barber</Link></li>
                 <li><Link to="/bookings" className="hover:text-gold">My bookings</Link></li>
                 <li><Link to="/celebrities" className="hover:text-gold">Artistas celebrity</Link></li>
+                <li><Link to="/community" className="hover:text-gold">Comunidad</Link></li>
+                <li><Link to="/u/new" search={{ edit: "" }} className="hover:text-gold">Crear mi perfil</Link></li>
+                <li><Link to="/classes" className="hover:text-gold">Clases en vivo</Link></li>
               </ul>
             </div>
             <div>
