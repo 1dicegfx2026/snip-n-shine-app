@@ -248,6 +248,42 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Sponsor + comunidad + clases */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <SponsorBanner />
+
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <Link
+            to="/community"
+            className="rounded-2xl border border-border bg-card p-8 transition-colors hover:border-gold/50"
+          >
+            <p className="text-xs font-bold tracking-[0.25em] text-gold">COMUNIDAD</p>
+            <h3 className="mt-2 font-display text-2xl font-bold">Tu propia página como cliente</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Guarda tus looks por categoría, conecta tus redes y enséñale al barbero justo lo que
+              quieres antes de sentarte.
+            </p>
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-gold">
+              Ver la comunidad <ArrowRight size={15} />
+            </span>
+          </Link>
+          <Link
+            to="/classes"
+            className="rounded-2xl border border-border bg-card p-8 transition-colors hover:border-gold/50"
+          >
+            <p className="text-xs font-bold tracking-[0.25em] text-gold">CLASES EN VIVO</p>
+            <h3 className="mt-2 font-display text-2xl font-bold">Aprende del que está cortando</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Fades, navaja, trenzas y color en vivo con los mejores pros. Pagas por clase y recibes
+              el enlace.
+            </p>
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-gold">
+              Ver clases <ArrowRight size={15} />
+            </span>
+          </Link>
+        </div>
+      </section>
+
       {/* Founder / creator */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <div className="grid items-center gap-10 md:grid-cols-2">
