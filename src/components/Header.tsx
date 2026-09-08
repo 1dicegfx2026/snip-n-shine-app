@@ -78,7 +78,7 @@ export function Header() {
             activeProps={{ className: "text-gold hover:text-gold" }}
           >
             <LayoutDashboard size={16} />
-            <span className="hidden sm:inline">Business</span>
+            <span className="hidden sm:inline">Barberos Premium</span>
           </Link>
         </nav>
 

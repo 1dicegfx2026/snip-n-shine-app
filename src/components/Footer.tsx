@@ -36,7 +36,7 @@ export function Footer() {
                 <li><Link to="/pro/new" search={{ edit: "" }} className="hover:text-gold">Crear mi página</Link></li>
                 <li><Link to="/pros" className="hover:text-gold">Páginas de pros</Link></li>
                 <li><Link to="/pricing" className="hover:text-gold">Membresías</Link></li>
-                <li><Link to="/dashboard" className="hover:text-gold">Business dashboard</Link></li>
+                <li><Link to="/dashboard" className="hover:text-gold">Panel Barberos Premium</Link></li>
                 <li><Link to="/celebrity/new" className="hover:text-gold">Crear perfil de artista</Link></li>
                 <li><Link to="/admin" className="hover:text-gold">Admin & video</Link></li>
               </ul>
