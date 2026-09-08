@@ -174,10 +174,10 @@ function ClientProfileView() {
                       params={{ slug: b.slug }}
                       className="flex items-center gap-3 hover:text-gold"
                     >
-                      <img src={b.avatarUrl} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                      <img src={b.avatar} alt="" className="h-10 w-10 rounded-lg object-cover" />
                       <span className="min-w-0">
                         <span className="block truncate text-sm font-semibold">{b.name}</span>
-                        <span className="block truncate text-xs text-muted-foreground">{b.shopName}</span>
+                        <span className="block truncate text-xs text-muted-foreground">{b.shop}</span>
                       </span>
                     </Link>
                   ))}
