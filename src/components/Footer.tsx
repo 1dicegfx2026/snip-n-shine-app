@@ -30,11 +30,15 @@ export function Footer() {
             <div>
               <p className="font-display font-semibold text-foreground">Professionals</p>
               <ul className="mt-3 space-y-2 text-muted-foreground">
+                <li><Link to="/pro/new" search={{ edit: "" }} className="hover:text-gold">Crear mi página</Link></li>
+                <li><Link to="/pros" className="hover:text-gold">Páginas de pros</Link></li>
+                <li><Link to="/pricing" className="hover:text-gold">Membresías</Link></li>
                 <li><Link to="/dashboard" className="hover:text-gold">Pro dashboard</Link></li>
                 <li><Link to="/celebrity/new" className="hover:text-gold">Crear perfil de artista</Link></li>
                 <li><Link to="/admin" className="hover:text-gold">Admin & video</Link></li>
               </ul>
             </div>
+
             <div>
               <p className="font-display font-semibold text-foreground">Partners</p>
               <ul className="mt-3 space-y-2 text-muted-foreground">

@@ -14,6 +14,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BookingProvider } from "../lib/booking-store";
 import { SiteProvider } from "../lib/site-store";
+import { ProProvider } from "../lib/pro-store";
+
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 
@@ -135,17 +137,20 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SiteProvider>
-        <BookingProvider>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">
-              <Outlet />
-            </main>
-            <Footer />
-          </div>
-          <Toaster theme="dark" position="bottom-right" richColors />
-        </BookingProvider>
+        <ProProvider>
+          <BookingProvider>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">
+                <Outlet />
+              </main>
+              <Footer />
+            </div>
+            <Toaster theme="dark" position="bottom-right" richColors />
+          </BookingProvider>
+        </ProProvider>
       </SiteProvider>
+
     </QueryClientProvider>
   );
 }
