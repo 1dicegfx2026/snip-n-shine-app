@@ -1,3 +1,4 @@
+import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/pro/new")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: ProBuilder,
+  component: GuardedProBuilder,
 });
 
 const CATEGORIES = ["Cuts", "Fades", "Beard", "Braids", "Color", "Shave", "Nails", "Styling"];
@@ -361,5 +362,13 @@ function Field({
         className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
       />
     </label>
+  );
+}
+
+function GuardedProBuilder() {
+  return (
+    <AuthGate title="Publica tu página de barbero">
+      <ProBuilder />
+    </AuthGate>
   );
 }

@@ -1,3 +1,4 @@
+import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CreditCard, ShieldCheck, PartyPopper } from "lucide-react";
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/book/$slug")({
       { property: "og:description", content: "Reserve your chair with a secure deposit on GILT." },
     ],
   }),
-  component: BookingFlow,
+  component: GuardedBookingFlow,
 });
 
 function BookingFlow() {
@@ -363,5 +364,13 @@ function Row({ label, value }: { label: string; value: string }) {
       <span className="text-muted-foreground">{label}</span>
       <span className="text-right font-semibold">{value}</span>
     </div>
+  );
+}
+
+function GuardedBookingFlow() {
+  return (
+    <AuthGate title="Reserva tu cita">
+      <BookingFlow />
+    </AuthGate>
   );
 }

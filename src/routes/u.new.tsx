@@ -1,3 +1,4 @@
+import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/u/new")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: ClientBuilder,
+  component: GuardedClientBuilder,
 });
 
 function uid() {
@@ -263,5 +264,13 @@ function Field({
         className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
       />
     </label>
+  );
+}
+
+function GuardedClientBuilder() {
+  return (
+    <AuthGate title="Crea tu perfil">
+      <ClientBuilder />
+    </AuthGate>
   );
 }

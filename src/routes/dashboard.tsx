@@ -1,3 +1,4 @@
+import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/dashboard")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: DashboardPage,
+  component: GuardedDashboardPage,
 });
 
 const DEMO_TODAY = [
@@ -456,5 +457,13 @@ function Row({ label, value }: { label: string; value: string }) {
       <span className="text-muted-foreground">{label}</span>
       <span className="font-semibold">{value}</span>
     </div>
+  );
+}
+
+function GuardedDashboardPage() {
+  return (
+    <AuthGate title="Panel de Barberos Premium">
+      <DashboardPage />
+    </AuthGate>
   );
 }
