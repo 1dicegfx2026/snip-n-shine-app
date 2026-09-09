@@ -14,13 +14,171 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          amount_paid: number
+          barber_slug: string
+          client_id: string | null
+          commission_rate: number
+          created_at: string
+          date_iso: string
+          deposit_rate: number
+          id: string
+          name: string
+          pay_method: string | null
+          pay_type: string
+          refunded: number
+          service_id: string
+          status: string
+          time: string
+          total: number
+        }
+        Insert: {
+          amount_paid?: number
+          barber_slug: string
+          client_id?: string | null
+          commission_rate?: number
+          created_at?: string
+          date_iso: string
+          deposit_rate?: number
+          id?: string
+          name: string
+          pay_method?: string | null
+          pay_type?: string
+          refunded?: number
+          service_id: string
+          status?: string
+          time: string
+          total?: number
+        }
+        Update: {
+          amount_paid?: number
+          barber_slug?: string
+          client_id?: string | null
+          commission_rate?: number
+          created_at?: string
+          date_iso?: string
+          deposit_rate?: number
+          id?: string
+          name?: string
+          pay_method?: string | null
+          pay_type?: string
+          refunded?: number
+          service_id?: string
+          status?: string
+          time?: string
+          total?: number
+        }
+        Relationships: []
+      }
+      client_profiles: {
+        Row: {
+          created_at: string
+          data: Json
+          handle: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data: Json
+          handle: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          handle?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pro_pages: {
+        Row: {
+          created_at: string
+          data: Json
+          deposit_rate: number
+          handle: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data: Json
+          deposit_rate?: number
+          handle: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          deposit_rate?: number
+          handle?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      waitlist: {
+        Row: {
+          barber_slug: string
+          client_id: string | null
+          created_at: string
+          date_iso: string
+          id: string
+          time: string
+        }
+        Insert: {
+          barber_slug: string
+          client_id?: string | null
+          created_at?: string
+          date_iso: string
+          id?: string
+          time: string
+        }
+        Update: {
+          barber_slug?: string
+          client_id?: string | null
+          created_at?: string
+          date_iso?: string
+          id?: string
+          time?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      owns_pro_page: {
+        Args: { _slug: string; _user: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
