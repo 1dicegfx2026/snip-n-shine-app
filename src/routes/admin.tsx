@@ -2,6 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus, Trash2, Eye, EyeOff, Film } from "lucide-react";
 import { useSite } from "@/lib/site-store";
+import { useBookings } from "@/lib/booking-store";
+import { usePros } from "@/lib/pro-store";
+import { useClients } from "@/lib/client-store";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -21,7 +25,14 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-  const { slides, addSlide, updateSlide, removeSlide, requests, leads } = useSite();
+  const { slides, addSlide, updateSlide, removeSlide, requests, leads, sponsors, saveSponsor, removeSponsor } =
+    useSite();
+  const { bookings } = useBookings();
+  const { pages } = usePros();
+  const { profiles } = useClients();
+  const [sp, setSp] = useState({ brand: "", tagline: "", offer: "", url: "", imageUrl: "" });
+  const money = (v: number) => `$${v.toFixed(2)}`;
+  const paid = bookings.reduce((a, b) => a + b.amountPaid - b.refunded, 0);
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
@@ -116,6 +127,140 @@ function AdminPage() {
         </div>
       </section>
 
+
+      <section className="mt-10 grid gap-4 sm:grid-cols-4">
+        <Stat label="CITAS" value={String(bookings.length)} />
+        <Stat label="BARBEROS" value={String(pages.length)} />
+        <Stat label="CLIENTES" value={String(profiles.length)} />
+        <Stat label="COBRADO" value={money(paid)} />
+      </section>
+
+      <section className="mt-8 rounded-xl border border-border bg-card p-5">
+        <h2 className="font-display text-lg font-bold">Todas las citas ({bookings.length})</h2>
+        <div className="mt-3 overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="text-xs uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="py-2 pr-4">Cliente</th>
+                <th className="py-2 pr-4">Barbero</th>
+                <th className="py-2 pr-4">Fecha</th>
+                <th className="py-2 pr-4">Pagado</th>
+                <th className="py-2 pr-4">Total</th>
+                <th className="py-2">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map((b) => (
+                <tr key={b.id} className="border-t border-border/60">
+                  <td className="py-2 pr-4">{b.name}</td>
+                  <td className="py-2 pr-4">{b.barberSlug}</td>
+                  <td className="py-2 pr-4 whitespace-nowrap">
+                    {b.dateISO} · {b.time}
+                  </td>
+                  <td className="py-2 pr-4">{money(b.amountPaid - b.refunded)}</td>
+                  <td className="py-2 pr-4">{money(b.total)}</td>
+                  <td className="py-2 capitalize">{b.status}</td>
+                </tr>
+              ))}
+              {bookings.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-4 text-muted-foreground">
+                    Todavía no hay citas.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="rounded-xl border border-border bg-card p-5">
+          <h2 className="font-display text-lg font-bold">Barberos ({pages.length})</h2>
+          <ul className="mt-3 space-y-2 text-sm">
+            {pages.map((pg) => (
+              <li key={pg.handle} className="flex items-center justify-between gap-3">
+                <span className="truncate">
+                  {pg.name} · <span className="text-muted-foreground">{pg.city}</span>
+                </span>
+                <Link to="/pro/$handle" params={{ handle: pg.handle }} className="shrink-0 text-xs font-bold text-gold">
+                  Ver
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-5">
+          <h2 className="font-display text-lg font-bold">Clientes ({profiles.length})</h2>
+          <ul className="mt-3 space-y-2 text-sm">
+            {profiles.map((c) => (
+              <li key={c.handle} className="flex items-center justify-between gap-3">
+                <span className="truncate">
+                  {c.name} · <span className="text-muted-foreground">{c.city}</span>
+                </span>
+                <Link to="/u/$handle" params={{ handle: c.handle }} className="shrink-0 text-xs font-bold text-gold">
+                  Ver
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="mt-8 rounded-xl border border-gold/30 bg-card p-5">
+        <h2 className="font-display text-lg font-bold">Sponsors ({sponsors.length})</h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <Field label="Marca" value={sp.brand} onChange={(v) => setSp({ ...sp, brand: v })} placeholder="Sharp47" />
+          <Field label="Frase" value={sp.tagline} onChange={(v) => setSp({ ...sp, tagline: v })} placeholder="Clippers profesionales" />
+          <Field label="Oferta" value={sp.offer} onChange={(v) => setSp({ ...sp, offer: v })} placeholder="20% off con GILT20" />
+          <Field label="Enlace" value={sp.url} onChange={(v) => setSp({ ...sp, url: v })} placeholder="https://…" />
+          <Field label="URL de la imagen" value={sp.imageUrl} onChange={(v) => setSp({ ...sp, imageUrl: v })} placeholder="https://…/banner.jpg" />
+        </div>
+        <button
+          onClick={() => {
+            if (!sp.brand.trim() || !sp.url.trim()) {
+              toast.error("Pon al menos la marca y el enlace.");
+              return;
+            }
+            saveSponsor({
+              id: sp.brand.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+              brand: sp.brand.trim(),
+              tagline: sp.tagline.trim(),
+              offer: sp.offer.trim(),
+              url: sp.url.trim(),
+              imageUrl: sp.imageUrl.trim(),
+            });
+            setSp({ brand: "", tagline: "", offer: "", url: "", imageUrl: "" });
+            toast.success("Sponsor guardado.");
+          }}
+          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-gold px-5 py-2.5 font-display text-sm font-bold text-gold-foreground hover:bg-gold/90"
+        >
+          <Plus size={15} /> Guardar sponsor
+        </button>
+        <div className="mt-4 space-y-2">
+          {sponsors.map((s2) => (
+            <div key={s2.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold">{s2.brand}</p>
+                <p className="truncate text-xs text-muted-foreground">{s2.offer || s2.tagline}</p>
+              </div>
+              <button
+                onClick={() => saveSponsor({ ...s2, featured: !s2.featured })}
+                className={`rounded-lg border border-border px-3 py-1.5 text-xs font-bold ${s2.featured ? "text-gold" : "text-muted-foreground"}`}
+              >
+                Destacado
+              </button>
+              <button
+                onClick={() => removeSponsor(s2.id)}
+                className="rounded-lg border border-border p-2 text-muted-foreground hover:text-destructive"
+                aria-label="Eliminar sponsor"
+              >
+                <Trash2 size={15} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
       <section className="mt-10 grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-border bg-card p-5">
           <p className="text-xs font-bold tracking-[0.2em] text-gold">SOLICITUDES A CELEBRITIES</p>
@@ -126,6 +271,15 @@ function AdminPage() {
           <p className="mt-2 font-display text-3xl font-extrabold">{leads.length}</p>
         </div>
       </section>
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <p className="text-xs font-bold tracking-[0.2em] text-gold">{label}</p>
+      <p className="mt-2 font-display text-3xl font-extrabold">{value}</p>
     </div>
   );
 }
