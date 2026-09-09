@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AffiliatesRouteImport } from './routes/affiliates'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BookingsRouteImport } from './routes/bookings'
 import { Route as CelebritiesRouteImport } from './routes/celebrities'
 import { Route as ClassesRouteImport } from './routes/classes'
@@ -43,6 +44,11 @@ const AdminRoute = AdminRouteImport.update({
 const AffiliatesRoute = AffiliatesRouteImport.update({
   id: '/affiliates',
   path: '/affiliates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookingsRoute = BookingsRouteImport.update({
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/affiliates': typeof AffiliatesRoute
+  '/auth': typeof AuthRoute
   '/bookings': typeof BookingsRoute
   '/celebrities': typeof CelebritiesRoute
   '/classes': typeof ClassesRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/affiliates': typeof AffiliatesRoute
+  '/auth': typeof AuthRoute
   '/bookings': typeof BookingsRoute
   '/celebrities': typeof CelebritiesRoute
   '/classes': typeof ClassesRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/affiliates': typeof AffiliatesRoute
+  '/auth': typeof AuthRoute
   '/bookings': typeof BookingsRoute
   '/celebrities': typeof CelebritiesRoute
   '/classes': typeof ClassesRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/affiliates'
+    | '/auth'
     | '/bookings'
     | '/celebrities'
     | '/classes'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/affiliates'
+    | '/auth'
     | '/bookings'
     | '/celebrities'
     | '/classes'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/affiliates'
+    | '/auth'
     | '/bookings'
     | '/celebrities'
     | '/classes'
@@ -271,6 +283,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AffiliatesRoute: typeof AffiliatesRoute
+  AuthRoute: typeof AuthRoute
   BookingsRoute: typeof BookingsRoute
   CelebritiesRoute: typeof CelebritiesRoute
   ClassesRoute: typeof ClassesRoute
@@ -311,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/affiliates'
       fullPath: '/affiliates'
       preLoaderRoute: typeof AffiliatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bookings': {
@@ -439,6 +459,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AffiliatesRoute: AffiliatesRoute,
+  AuthRoute: AuthRoute,
   BookingsRoute: BookingsRoute,
   CelebritiesRoute: CelebritiesRoute,
   ClassesRoute: ClassesRoute,
