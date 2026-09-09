@@ -14,7 +14,7 @@ export interface Booking {
   time: string;
   name: string;
   payType: "deposit" | "full";
-  payMethod?: string;
+  payMethod?: string | undefined;
   /** Porcentaje de depósito usado al reservar (0.25 = 25%) */
   depositRate: number;
   /** Comisión de la plataforma aplicada a este corte (0.1 = 10%) */
@@ -159,7 +159,11 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const patch = (id: string, p: Partial<Booking>, dbPatch: Record<string, unknown>) => {
+  const patch = (
+    id: string,
+    p: Partial<Booking>,
+    dbPatch: { status?: string; amount_paid?: number; refunded?: number },
+  ) => {
     setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, ...p } : b)));
     void supabase.from("bookings").update(dbPatch).eq("id", id);
   };
