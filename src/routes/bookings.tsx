@@ -1,8 +1,10 @@
+import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarX, BellRing, Hourglass, CalendarPlus, ArrowRight } from "lucide-react";
 import { getBarber, formatDateLong } from "@/lib/data/barbers";
 import { useBookings } from "@/lib/booking-store";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/bookings")({
   head: () => ({
@@ -13,7 +15,7 @@ export const Route = createFileRoute("/bookings")({
       { property: "og:description", content: "Your upcoming appointments, reminders and waitlist spots." },
     ],
   }),
-  component: BookingsPage,
+  component: GuardedBookingsPage,
 });
 
 function slotLabel(time: string) {
@@ -25,8 +27,10 @@ function slotLabel(time: string) {
 
 function BookingsPage() {
   const { bookings, waitlist, cancelBooking, leaveWaitlist } = useBookings();
-  const upcoming = bookings.filter((b) => b.status === "upcoming");
-  const cancelled = bookings.filter((b) => b.status === "cancelled");
+  const { user } = useAuth();
+  const mine = bookings.filter((b) => b.clientId === user?.id);
+  const upcoming = mine.filter((b) => b.status === "upcoming");
+  const cancelled = mine.filter((b) => b.status === "cancelled");
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
@@ -163,5 +167,13 @@ function BookingsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function GuardedBookingsPage() {
+  return (
+    <AuthGate title="Tus citas">
+      <BookingsPage />
+    </AuthGate>
   );
 }

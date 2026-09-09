@@ -16,6 +16,7 @@ import { BookingProvider } from "../lib/booking-store";
 import { SiteProvider } from "../lib/site-store";
 import { ProProvider } from "../lib/pro-store";
 import { ClientProvider } from "../lib/client-store";
+import { AuthProvider } from "../lib/auth";
 
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
@@ -137,6 +138,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthProvider>
       <SiteProvider>
         <ProProvider>
           <ClientProvider>
@@ -153,6 +155,7 @@ function RootComponent() {
           </ClientProvider>
         </ProProvider>
       </SiteProvider>
+      </AuthProvider>
 
     </QueryClientProvider>
   );

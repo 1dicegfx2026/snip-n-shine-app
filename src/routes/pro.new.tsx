@@ -1,3 +1,4 @@
+import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/pro/new")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: ProBuilder,
+  component: GuardedProBuilder,
 });
 
 const CATEGORIES = ["Cuts", "Fades", "Beard", "Braids", "Color", "Shave", "Nails", "Styling"];
@@ -90,13 +91,18 @@ function ProBuilder() {
       ],
     });
 
-  const publish = () => {
+  const publish = async () => {
     const handle = (p.handle || p.name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     if (!p.name.trim() || !handle) {
       toast.error("Pon al menos tu nombre.");
       return;
     }
-    savePage({ ...p, handle });
+    try {
+      await savePage({ ...p, handle });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No pudimos guardar.");
+      return;
+    }
     toast.success("¡Tu página está publicada!");
     navigate({ to: "/pro/$handle", params: { handle } });
   };
@@ -356,5 +362,13 @@ function Field({
         className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
       />
     </label>
+  );
+}
+
+function GuardedProBuilder() {
+  return (
+    <AuthGate title="Publica tu página de barbero">
+      <ProBuilder />
+    </AuthGate>
   );
 }

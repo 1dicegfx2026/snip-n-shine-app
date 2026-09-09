@@ -1,3 +1,4 @@
+import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/u/new")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: ClientBuilder,
+  component: GuardedClientBuilder,
 });
 
 function uid() {
@@ -73,13 +74,18 @@ function ClientBuilder() {
   const updateLook = (id: string, patch: Partial<WorkItem>) =>
     set("looks", p.looks.map((l) => (l.id === id ? { ...l, ...patch } : l)));
 
-  const save = () => {
+  const save = async () => {
     const handle = p.handle.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
     if (!handle || !p.name.trim()) {
       toast.error("Necesitas un nombre y un @usuario.");
       return;
     }
-    saveProfile({ ...p, handle, createdAt: p.createdAt || Date.now() });
+    try {
+      await saveProfile({ ...p, handle, createdAt: p.createdAt || Date.now() });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No pudimos guardar.");
+      return;
+    }
     toast.success("Perfil guardado.");
     navigate({ to: "/u/$handle", params: { handle } });
   };
@@ -258,5 +264,13 @@ function Field({
         className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
       />
     </label>
+  );
+}
+
+function GuardedClientBuilder() {
+  return (
+    <AuthGate title="Crea tu perfil">
+      <ClientBuilder />
+    </AuthGate>
   );
 }

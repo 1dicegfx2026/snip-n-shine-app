@@ -1,10 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { CalendarDays, ExternalLink, LayoutDashboard, Star } from "lucide-react";
+import { CalendarDays, ExternalLink, LayoutDashboard, LogIn, LogOut, Star } from "lucide-react";
 import { useBookings } from "@/lib/booking-store";
+import { useAuth } from "@/lib/auth";
 
 export function Header() {
   const { bookings } = useBookings();
-  const upcoming = bookings.filter((b) => b.status === "upcoming").length;
+  const { user, displayName, signOut } = useAuth();
+  const upcoming = bookings.filter(
+    (b) => b.status === "upcoming" && b.clientId === user?.id,
+  ).length;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -82,6 +86,26 @@ export function Header() {
           </Link>
         </nav>
 
+        <div className="flex items-center gap-2">
+          {user ? (
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground"
+              title={displayName}
+            >
+              <LogOut size={13} />
+              <span className="hidden sm:inline">Salir</span>
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground hover:bg-primary/85"
+            >
+              <LogIn size={13} />
+              Entrar
+            </Link>
+          )}
         <a
           href="https://www.sharp47.com/products/sharp-47-clipper-and-trimmers"
           target="_blank"
@@ -91,6 +115,7 @@ export function Header() {
           Sponsor <span className="text-foreground">Sharp47</span>
           <ExternalLink size={12} />
         </a>
+        </div>
       </div>
     </header>
   );
