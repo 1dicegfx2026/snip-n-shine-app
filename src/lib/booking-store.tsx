@@ -182,7 +182,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         status: "upcoming",
       };
       setBookings((prev) => [...prev, booking]);
-      void supabase.from("bookings").insert({
+      void (async () => {
+        const { error } = await supabase.from("bookings").insert({
         id: booking.id,
         client_id: user?.id ?? null,
         barber_slug: booking.barberSlug,
@@ -197,8 +198,10 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         amount_paid: booking.amountPaid,
         refunded: 0,
         total: booking.total,
-        status: "upcoming",
-      });
+          status: "upcoming",
+        });
+        if (error) console.error("booking insert failed", error.message, error.details);
+      })();
       return booking;
     },
     markArrived: (id) => {
