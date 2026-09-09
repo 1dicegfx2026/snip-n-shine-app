@@ -90,13 +90,18 @@ function ProBuilder() {
       ],
     });
 
-  const publish = () => {
+  const publish = async () => {
     const handle = (p.handle || p.name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     if (!p.name.trim() || !handle) {
       toast.error("Pon al menos tu nombre.");
       return;
     }
-    savePage({ ...p, handle });
+    try {
+      await savePage({ ...p, handle });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No pudimos guardar.");
+      return;
+    }
     toast.success("¡Tu página está publicada!");
     navigate({ to: "/pro/$handle", params: { handle } });
   };

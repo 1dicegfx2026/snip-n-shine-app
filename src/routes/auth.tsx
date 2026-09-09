@@ -133,7 +133,7 @@ function AuthPage() {
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
         ¿Eres barbero?{" "}
-        <Link to="/pro/new" className="font-semibold text-gold">
+        <Link to="/pro/new" search={{ edit: "" }} className="font-semibold text-gold">
           Crea tu página
         </Link>{" "}
         después de entrar.

@@ -73,13 +73,18 @@ function ClientBuilder() {
   const updateLook = (id: string, patch: Partial<WorkItem>) =>
     set("looks", p.looks.map((l) => (l.id === id ? { ...l, ...patch } : l)));
 
-  const save = () => {
+  const save = async () => {
     const handle = p.handle.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
     if (!handle || !p.name.trim()) {
       toast.error("Necesitas un nombre y un @usuario.");
       return;
     }
-    saveProfile({ ...p, handle, createdAt: p.createdAt || Date.now() });
+    try {
+      await saveProfile({ ...p, handle, createdAt: p.createdAt || Date.now() });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No pudimos guardar.");
+      return;
+    }
     toast.success("Perfil guardado.");
     navigate({ to: "/u/$handle", params: { handle } });
   };
