@@ -6,6 +6,8 @@ import { useBookings } from "@/lib/booking-store";
 import { usePros } from "@/lib/pro-store";
 import { useClients } from "@/lib/client-store";
 import { Link } from "@tanstack/react-router";
+import { useAdmin } from "@/lib/admin";
+import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -31,6 +33,8 @@ function AdminPage() {
   const { pages } = usePros();
   const { profiles } = useClients();
   const [sp, setSp] = useState({ brand: "", tagline: "", offer: "", url: "", imageUrl: "" });
+  const { user } = useAuth();
+  const admin = useAdmin();
   const money = (v: number) => `$${v.toFixed(2)}`;
   const paid = bookings.reduce((a, b) => a + b.amountPaid - b.refunded, 0);
   const [title, setTitle] = useState("");
@@ -127,6 +131,82 @@ function AdminPage() {
         </div>
       </section>
 
+
+
+      {!admin.loading && !admin.isAdmin && (
+        <section className="mt-8 rounded-xl border border-gold/40 bg-card p-5">
+          <h2 className="font-display text-lg font-bold">Acceso de administrador</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {user
+              ? "Esta cuenta todavía no es administradora. Si eres el dueño y nadie ha reclamado el acceso, tómalo aquí."
+              : "Entra con tu cuenta para reclamar el acceso de administrador."}
+          </p>
+          {user ? (
+            <button
+              onClick={async () => {
+                const ok = await admin.claimAdmin();
+                toast[ok ? "success" : "error"](
+                  ok ? "Ya eres administrador." : "Ya hay un administrador. Pídele que te dé acceso.",
+                );
+              }}
+              className="mt-4 rounded-xl bg-gold px-5 py-2.5 font-display text-sm font-bold text-gold-foreground hover:bg-gold/90"
+            >
+              Reclamar administrador
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              className="mt-4 inline-block rounded-xl bg-gold px-5 py-2.5 font-display text-sm font-bold text-gold-foreground hover:bg-gold/90"
+            >
+              Entrar
+            </Link>
+          )}
+        </section>
+      )}
+
+      {admin.isAdmin && (
+        <section className="mt-8 rounded-xl border border-gold/30 bg-card p-5">
+          <h2 className="font-display text-lg font-bold">Usuarios y accesos gratis ({admin.users.length})</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Dale acceso gratis a quien quieras, cámbiale el plan o hazlo administrador.
+          </p>
+          <div className="mt-4 space-y-2">
+            {admin.users.map((u) => (
+              <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-border p-3">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold">{u.displayName}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {u.freeAccess ? "Acceso gratis" : "Paga normal"} · plan {u.plan}
+                    {u.isAdmin ? " · admin" : ""}
+                  </p>
+                </div>
+                <select
+                  value={u.plan}
+                  onChange={(e) => void admin.setPlan(u.id, e.target.value)}
+                  className="rounded-lg border border-input bg-background px-3 py-1.5 text-xs"
+                >
+                  <option value="free">Free</option>
+                  <option value="starter">Starter $19</option>
+                  <option value="pro">Pro $49</option>
+                  <option value="elite">Elite $99</option>
+                </select>
+                <button
+                  onClick={() => void admin.setFreeAccess(u.id, !u.freeAccess)}
+                  className={`rounded-lg border border-border px-3 py-1.5 text-xs font-bold ${u.freeAccess ? "text-gold" : "text-muted-foreground"}`}
+                >
+                  Gratis
+                </button>
+                <button
+                  onClick={() => void admin.setAdmin(u.id, !u.isAdmin)}
+                  className={`rounded-lg border border-border px-3 py-1.5 text-xs font-bold ${u.isAdmin ? "text-gold" : "text-muted-foreground"}`}
+                >
+                  Admin
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="mt-10 grid gap-4 sm:grid-cols-4">
         <Stat label="CITAS" value={String(bookings.length)} />
