@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { CelebProfile } from "@/lib/data/celebrities";
+import { SPONSORS, type Sponsor } from "@/lib/data/sponsors";
 import heroImg from "@/assets/hero.jpg";
 import promoShot from "@/assets/promo/promo-2.jpg";
 
@@ -65,6 +66,9 @@ interface SiteStore {
   cancelRequest: (id: string) => void;
   leads: Lead[];
   addLead: (l: Omit<Lead, "id" | "createdAt">) => void;
+  sponsors: Sponsor[];
+  saveSponsor: (s: Sponsor) => void;
+  removeSponsor: (id: string) => void;
 }
 
 const KEY = "gilt-site-v1";
@@ -103,6 +107,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   const [celebProfiles, setCelebProfiles] = useState<CelebProfile[]>([]);
   const [requests, setRequests] = useState<CelebRequest[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [sponsors, setSponsors] = useState<Sponsor[]>(SPONSORS);
 
   useEffect(() => {
     try {
@@ -113,6 +118,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
         setCelebProfiles(p.celebProfiles ?? []);
         setRequests(p.requests ?? []);
         setLeads(p.leads ?? []);
+        if (Array.isArray(p.sponsors) && p.sponsors.length) setSponsors(p.sponsors);
       }
     } catch {
       /* ignore */
@@ -122,8 +128,8 @@ export function SiteProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(KEY, JSON.stringify({ slides, celebProfiles, requests, leads }));
-  }, [slides, celebProfiles, requests, leads, hydrated]);
+    localStorage.setItem(KEY, JSON.stringify({ slides, celebProfiles, requests, leads, sponsors }));
+  }, [slides, celebProfiles, requests, leads, sponsors, hydrated]);
 
   const store: SiteStore = {
     hydrated,
@@ -146,6 +152,14 @@ export function SiteProvider({ children }: { children: ReactNode }) {
       setRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: "cancelled" } : r))),
     leads,
     addLead: (l) => setLeads((prev) => [...prev, { ...l, id: uid(), createdAt: Date.now() }]),
+    sponsors,
+    saveSponsor: (sp) =>
+      setSponsors((prev) =>
+        prev.some((x) => x.id === sp.id)
+          ? prev.map((x) => (x.id === sp.id ? sp : x))
+          : [...prev, sp],
+      ),
+    removeSponsor: (id) => setSponsors((prev) => prev.filter((x) => x.id !== id)),
   };
 
   return <SiteContext.Provider value={store}>{children}</SiteContext.Provider>;
