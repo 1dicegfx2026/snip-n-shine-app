@@ -45,6 +45,20 @@ function BookingFlow() {
   const [payMethod, setPayMethod] = useState<PayMethod>("card");
   const [confirmed, setConfirmed] = useState(false);
 
+  const { settings } = usePlatformSettings();
+  const enabledPay = useMemo<PayMethod[]>(() => {
+    const list: PayMethod[] = [];
+    if (settings.payCard) list.push("card");
+    if (settings.payZelle) list.push("zelle");
+    if (settings.payCashapp) list.push("cashapp");
+    if (settings.payCash) list.push("cash");
+    return list.length ? list : ["card"];
+  }, [settings]);
+
+  useEffect(() => {
+    if (!enabledPay.includes(payMethod)) setPayMethod(enabledPay[0] as PayMethod);
+  }, [enabledPay, payMethod]);
+
   const service = barber.services.find((s) => s.id === serviceId);
   const days = useMemo(() => nextNDates(14), []);
   const slots = dateISO ? getSlots(barber, dateISO, bookedTimesFor(barber.slug, dateISO)) : [];
