@@ -88,8 +88,10 @@ export function useAdmin(): AdminStore {
   const isAdmin = roles.includes("admin");
 
   const setRole = async (id: string, role: StaffRole, value: boolean) => {
-    if (value) await supabase.from("user_roles").insert({ user_id: id, role });
-    else await supabase.from("user_roles").delete().eq("user_id", id).eq("role", role);
+    const result = value
+      ? await supabase.from("user_roles").upsert({ user_id: id, role }, { onConflict: "user_id,role" })
+      : await supabase.from("user_roles").delete().eq("user_id", id).eq("role", role);
+    if (result.error) throw new Error(result.error.message);
     await refresh();
   };
 
@@ -108,11 +110,13 @@ export function useAdmin(): AdminStore {
       return true;
     },
     setFreeAccess: async (id, value) => {
-      await supabase.from("profiles").update({ free_access: value }).eq("id", id);
+      const { error } = await supabase.from("profiles").update({ free_access: value }).eq("id", id);
+      if (error) throw new Error(error.message);
       await refresh();
     },
     setPlan: async (id, plan) => {
-      await supabase.from("profiles").update({ plan }).eq("id", id);
+      const { error } = await supabase.from("profiles").update({ plan }).eq("id", id);
+      if (error) throw new Error(error.message);
       await refresh();
     },
     setAdmin: async (id, value) => setRole(id, "admin", value),
