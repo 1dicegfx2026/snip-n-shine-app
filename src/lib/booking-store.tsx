@@ -208,6 +208,29 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       })();
       return booking;
     },
+    updateBooking: async (id, patch) => {
+      const dbPatch: Record<string, string | null> = {};
+      if (patch.serviceId !== undefined) dbPatch.service_id = patch.serviceId;
+      if (patch.dateISO !== undefined) dbPatch.date_iso = patch.dateISO;
+      if (patch.time !== undefined) dbPatch.time = patch.time;
+      if (patch.name !== undefined) dbPatch.name = patch.name;
+      if (patch.payType !== undefined) dbPatch.pay_type = patch.payType;
+      if (patch.payMethod !== undefined) dbPatch.pay_method = patch.payMethod ?? null;
+      setBookings((prev) =>
+        prev.map((b) => {
+          if (b.id !== id) return b;
+          const next = { ...b, ...patch };
+          const svc = patch.serviceId ? undefined : b.serviceId;
+          const barberSlug = b.barberSlug;
+          const barber = (await import("@/lib/data/barbers")).getBarber(barberSlug);
+          const service = barber?.services.find((s) => s.id === next.serviceId);
+          if (service) next.total = service.price;
+          return next;
+        }),
+      );
+      const { error } = await supabase.from("bookings").update(dbPatch).eq("id", id);
+      if (error) console.error("booking update failed", error.message);
+    },
     markArrived: (id) => {
       const b = bookings.find((x) => x.id === id);
       const total = b?.total ?? 0;
