@@ -283,7 +283,7 @@ function BookingsPage() {
       </div>
 
 
-      {upcoming.length === 0 && waitlist.length === 0 ? (
+      {upcoming.length === 0 && waitlist.length === 0 && past.length === 0 && cancelled.length === 0 ? (
         <div className="mt-10 rounded-xl border border-border bg-card p-14 text-center">
           <CalendarX size={36} className="mx-auto text-muted-foreground" />
           <p className="mt-4 font-display text-xl font-bold">Nothing booked yet</p>
