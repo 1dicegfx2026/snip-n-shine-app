@@ -74,17 +74,26 @@ function BookingFlow() {
         </p>
         <div className="mt-6 rounded-xl border border-gold/30 bg-card p-5 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Paid today ({payType === "deposit" ? `${Math.round(depositRate * 100)}% deposit` : "full"})</span>
-            <span className="font-bold text-gold">${dueToday}</span>
+            <span className="text-muted-foreground">
+              {offline
+                ? `Pagas al llegar (${PAY_METHODS.find((m) => m.id === payMethod)?.label})`
+                : `Paid today (${payType === "deposit" ? `${Math.round(depositRate * 100)}% deposit` : "full"})`}
+            </span>
+            <span className="font-bold text-gold">${offline ? total : dueToday}</span>
           </div>
-          <div className="mt-2 flex justify-between">
-            <span className="text-muted-foreground">Due at the chair</span>
-            <span className="font-semibold">${total - dueToday}</span>
-          </div>
+          {!offline && (
+            <div className="mt-2 flex justify-between">
+              <span className="text-muted-foreground">Due at the chair</span>
+              <span className="font-semibold">${total - dueToday}</span>
+            </div>
+          )}
         </div>
         <p className="mt-4 text-xs text-muted-foreground">
-          Reminders set: 24h before (email) and 2h before (SMS). Demo mode — no card was charged.
+          {offline
+            ? "Sin tarjeta: el barbero confirma tu pago en la barbería. Recordatorios 24h antes (email) y 2h antes (SMS)."
+            : "Reminders set: 24h before (email) and 2h before (SMS). Demo mode — no card was charged."}
         </p>
+
         <div className="mt-8 flex justify-center gap-3">
           <Link
             to="/bookings"
