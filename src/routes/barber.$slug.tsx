@@ -4,6 +4,9 @@ import { getBarber, getSlots, nextNDates, formatDateLong } from "@/lib/data/barb
 import { Stars } from "@/components/Stars";
 import { useBookings } from "@/lib/booking-store";
 import { toast } from "sonner";
+import { useReviews } from "@/lib/review-store";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { ShareButton } from "@/components/ShareButton";
 
 export const Route = createFileRoute("/barber/$slug")({
   loader: ({ params }) => {
