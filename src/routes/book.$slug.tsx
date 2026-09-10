@@ -269,7 +269,7 @@ function BookingFlow() {
                     <CreditCard size={14} /> Método de pago
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {PAY_METHODS.map((m) => (
+                    {PAY_METHODS.filter((m) => enabledPay.includes(m.id)).map((m) => (
                       <button
                         key={m.id}
                         onClick={() => setPayMethod(m.id)}
