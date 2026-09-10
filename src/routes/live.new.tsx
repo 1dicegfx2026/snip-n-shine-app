@@ -23,7 +23,7 @@ export const Route = createFileRoute("/live/new")({
     ],
   }),
   component: () => (
-    <AuthGate>
+    <AuthGate title="Inicia sesión para transmitir en vivo">
       <GoLivePage />
     </AuthGate>
   ),
