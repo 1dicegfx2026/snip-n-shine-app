@@ -101,13 +101,21 @@ function AdminPage() {
       <h1 className="mt-2 font-display text-4xl font-extrabold">Panel de control</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         Desde aquí editas, cancelas, devuelves y borras cualquier cosa: citas, pagos, barberos,
-        clientes, usuarios, sponsors y la publicidad de la portada.
+        clientes, usuarios, sponsors, publicidad, comisiones y el equipo.
       </p>
+      <p className="mt-2 text-xs font-bold tracking-widest text-gold">
+        TU ACCESO: {admin.roles.map((r) => ROLE_ES[r]).join(" · ").toUpperCase()}
+      </p>
+      {!admin.canEdit && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Como ayudante puedes ver todo, pero los cambios los guarda un admin o moderador.
+        </p>
+      )}
 
       <Overview />
 
       <nav className="mt-8 flex flex-wrap gap-2">
-        {TABS.map((t) => (
+        {TABS.filter((t) => admin.isAdmin || !t.adminOnly).map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
