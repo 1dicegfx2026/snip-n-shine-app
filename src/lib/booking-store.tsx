@@ -278,7 +278,15 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       );
     },
     adminPatch: async (id, p) => {
-      const dbPatch: Record<string, unknown> = {};
+      const dbPatch: {
+        status?: string;
+        amount_paid?: number;
+        refunded?: number;
+        total?: number;
+        name?: string;
+        date_iso?: string;
+        time?: string;
+      } = {};
       if (p.status !== undefined) dbPatch["status"] = p.status;
       if (p.amountPaid !== undefined) dbPatch["amount_paid"] = p.amountPaid;
       if (p.refunded !== undefined) dbPatch["refunded"] = p.refunded;
