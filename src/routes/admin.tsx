@@ -139,6 +139,7 @@ function AdminPage() {
         {tab === "sponsors" && <SponsorsPanel />}
         {tab === "anuncios" && <SlidesPanel />}
         {tab === "solicitudes" && <RequestsPanel />}
+        {tab === "ajustes" && admin.isAdmin && <SettingsPanel />}
       </div>
     </div>
   );
