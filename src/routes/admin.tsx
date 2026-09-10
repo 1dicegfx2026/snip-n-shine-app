@@ -136,6 +136,7 @@ function AdminPage() {
         {tab === "citas" && <BookingsPanel admin={admin} />}
         {tab === "barberos" && <ProsPanel />}
         {tab === "clientes" && <ClientsPanel />}
+        {tab === "resenas" && <ReviewsPanel canEdit={admin.canEdit} />}
         {tab === "usuarios" && <UsersPanel admin={admin} />}
         {tab === "sponsors" && <SponsorsPanel />}
         {tab === "anuncios" && <SlidesPanel />}
