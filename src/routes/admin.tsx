@@ -73,11 +73,11 @@ function AdminPage() {
     return <Gate title="Panel de control" text="Cargando tu acceso…" />;
   }
 
-  if (!admin.isAdmin) {
+  if (!admin.isStaff) {
     return (
       <Gate
         title="Panel de control"
-        text="Esta cuenta todavía no es administradora. Si eres el dueño y nadie ha reclamado el acceso, tómalo aquí."
+        text="Esta cuenta todavía no es del equipo. Si eres el dueño y nadie ha reclamado el acceso, tómalo aquí."
         action={
           <button
             onClick={async () => {
