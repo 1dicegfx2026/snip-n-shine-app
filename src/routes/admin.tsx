@@ -31,13 +31,14 @@ export const Route = createFileRoute("/admin")({
 });
 
 const TABS = [
-  { id: "citas", label: "Citas" },
-  { id: "barberos", label: "Barberos" },
-  { id: "clientes", label: "Clientes" },
-  { id: "usuarios", label: "Usuarios" },
-  { id: "sponsors", label: "Sponsors" },
-  { id: "anuncios", label: "Anuncios" },
-  { id: "solicitudes", label: "Solicitudes" },
+  { id: "citas", label: "Citas", adminOnly: false },
+  { id: "barberos", label: "Barberos", adminOnly: false },
+  { id: "clientes", label: "Clientes", adminOnly: false },
+  { id: "usuarios", label: "Usuarios", adminOnly: true },
+  { id: "sponsors", label: "Sponsors", adminOnly: false },
+  { id: "anuncios", label: "Anuncios", adminOnly: false },
+  { id: "solicitudes", label: "Solicitudes", adminOnly: false },
+  { id: "ajustes", label: "Ajustes", adminOnly: true },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
