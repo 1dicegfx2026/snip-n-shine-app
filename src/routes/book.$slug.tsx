@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, Check, CreditCard, ShieldCheck, PartyPopper } fr
 import { getBarber, getSlots, nextNDates, formatDateLong } from "@/lib/data/barbers";
 import { BASE_COMMISSION } from "@/lib/data/pro-pages";
 import { useBookings } from "@/lib/booking-store";
-import { PAY_METHODS, type PayMethod } from "@/lib/site-store";
+import { PAY_METHODS, OFFLINE_PAY_METHODS, type PayMethod } from "@/lib/site-store";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/book/$slug")({
@@ -50,7 +50,8 @@ function BookingFlow() {
   const slots = dateISO ? getSlots(barber, dateISO, bookedTimesFor(barber.slug, dateISO)) : [];
 
   const total = service?.price ?? 0;
-  const dueToday = payType === "deposit" ? Math.round(total * depositRate) : total;
+  const offline = OFFLINE_PAY_METHODS.includes(payMethod);
+  const dueToday = offline ? 0 : payType === "deposit" ? Math.round(total * depositRate) : total;
 
   const missing = [
     !service && "escoger el servicio",
