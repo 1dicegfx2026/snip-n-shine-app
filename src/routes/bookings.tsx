@@ -1,6 +1,10 @@
 import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarX, BellRing, Hourglass, CalendarPlus, ArrowRight, Pencil, X, Check, Eye, MapPin, CreditCard, AlertTriangle } from "lucide-react";
+import { CalendarX, BellRing, Hourglass, CalendarPlus, ArrowRight, Pencil, X, Check, Eye, MapPin, CreditCard, AlertTriangle, CalendarDays, Trophy, Star } from "lucide-react";
+import { downloadICS } from "@/lib/calendar";
+import { ReviewForm } from "@/components/ReviewForm";
+import { ShareButton } from "@/components/ShareButton";
+import { useReviews } from "@/lib/review-store";
 import { getBarber, formatDateLong, getSlots, nextNDates } from "@/lib/data/barbers";
 import { useBookings } from "@/lib/booking-store";
 import { toast } from "sonner";
@@ -219,9 +223,14 @@ function BookingsPage() {
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const { reviewFor } = useReviews();
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
   const mine = bookings.filter((b) => b.clientId === user?.id);
-  const upcoming = mine.filter((b) => b.status === "upcoming");
-  const cancelled = mine.filter((b) => b.status === "cancelled");
+  const upcoming = mine.filter((b) => b.status === "upcoming" || b.status === "arrived");
+  const past = mine.filter((b) => b.status === "completed");
+  const cancelled = mine.filter((b) => b.status === "cancelled" || b.status === "refunded");
+  const loyaltyDone = past.length % 5;
+  const spent = mine.reduce((sum, b) => sum + b.amountPaid, 0);
   const detailsBooking = mine.find((b) => b.id === detailsId);
   const detailsBarber = detailsBooking ? getBarber(detailsBooking.barberSlug) : undefined;
   const detailsService = detailsBarber?.services.find((s) => s.id === detailsBooking?.serviceId);
@@ -246,7 +255,35 @@ function BookingsPage() {
       <p className="text-xs font-bold tracking-[0.25em] text-gold">MY CHAIRS</p>
       <h1 className="mt-2 font-display text-4xl font-extrabold">My bookings</h1>
 
-      {upcoming.length === 0 && waitlist.length === 0 ? (
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground">Cortes completados</p>
+          <p className="mt-1 font-display text-2xl font-bold">{past.length}</p>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground">Total pagado</p>
+          <p className="mt-1 font-display text-2xl font-bold">${spent.toFixed(2)}</p>
+        </div>
+        <div className="rounded-xl border border-gold/40 bg-gold/5 p-4">
+          <p className="flex items-center gap-1.5 text-xs font-semibold text-gold">
+            <Trophy size={13} /> Club GILT
+          </p>
+          <div className="mt-2 flex gap-1.5">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <span
+                key={i}
+                className={`h-2 flex-1 rounded-full ${i < loyaltyDone ? "bg-gold" : "bg-border"}`}
+              />
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {5 - loyaltyDone} corte{5 - loyaltyDone === 1 ? "" : "s"} para tu recompensa
+          </p>
+        </div>
+      </div>
+
+
+      {upcoming.length === 0 && waitlist.length === 0 && past.length === 0 && cancelled.length === 0 ? (
         <div className="mt-10 rounded-xl border border-border bg-card p-14 text-center">
           <CalendarX size={36} className="mx-auto text-muted-foreground" />
           <p className="mt-4 font-display text-xl font-bold">Nothing booked yet</p>
@@ -324,6 +361,26 @@ function BookingsPage() {
                     >
                       Cancelar cita
                     </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        downloadICS({
+                          title: `${service?.name ?? "Cita"} — ${barber.name}`,
+                          description: `Reserva GILT con ${barber.name}. Total $${b.total}.`,
+                          location: `${barber.shop}, ${barber.neighborhood}`,
+                          dateISO: b.dateISO,
+                          time: b.time,
+                          durationMin: service?.durationMin ?? 45,
+                        })
+                      }
+                      className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-gold hover:text-gold"
+                    >
+                      <CalendarDays size={13} /> Calendario
+                    </button>
+                    <ShareButton
+                      title={`Mi cita con ${barber.name} en GILT`}
+                      path={`/barber/${barber.slug}`}
+                    />
                   </div>
                 </div>
               </div>
@@ -359,6 +416,64 @@ function BookingsPage() {
                     >
                       Leave
                     </button>
+                  </div>
+                );
+              })}
+            </>
+          )}
+
+          {past.length > 0 && (
+            <>
+              <h2 className="pt-4 font-display text-lg font-bold">Historial</h2>
+              {past.map((b) => {
+                const barber = getBarber(b.barberSlug);
+                const service = barber?.services.find((s) => s.id === b.serviceId);
+                if (!barber) return null;
+                const existing = reviewFor(b.id);
+                return (
+                  <div key={b.id} className="rounded-xl border border-border bg-card p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="font-display font-bold">{service?.name ?? "Cita"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {barber.name} · {formatDateLong(b.dateISO)} · ${b.total}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Link
+                          to="/book/$slug"
+                          params={{ slug: barber.slug }}
+                          search={{ service: b.serviceId, date: "", time: "" }}
+                          className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/85"
+                        >
+                          <CalendarPlus size={13} /> Reservar igual
+                        </Link>
+                        {existing ? (
+                          <span className="inline-flex items-center gap-1 rounded-lg border border-gold/40 bg-gold/10 px-3 py-2 text-xs font-bold text-gold">
+                            <Star size={13} className="fill-gold" /> {existing.rating}/5 reseñado
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setReviewingId(reviewingId === b.id ? null : b.id)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-gold/40 px-3 py-2 text-xs font-bold text-gold hover:bg-gold/10"
+                          >
+                            <Star size={13} /> Dejar reseña
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {reviewingId === b.id && !existing && (
+                      <div className="mt-4">
+                        <ReviewForm
+                          bookingId={b.id}
+                          barberSlug={b.barberSlug}
+                          authorName={b.name}
+                          serviceName={service?.name ?? ""}
+                          onDone={() => setReviewingId(null)}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })}
