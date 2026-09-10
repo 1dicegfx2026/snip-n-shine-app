@@ -184,6 +184,13 @@ function BarberProfile() {
                   {r.comment && (
                     <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{r.comment}</p>
                   )}
+                  <ReviewReply
+                    reviewId={r.id}
+                    barberSlug={barber.slug}
+                    reply={r.reply}
+                    replyAt={r.replyAt}
+                    barberName={barber.name}
+                  />
                 </article>
               ))}
               {barber.reviews.map((r) => (
