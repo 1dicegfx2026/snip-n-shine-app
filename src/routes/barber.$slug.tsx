@@ -35,6 +35,8 @@ function BarberProfile() {
   const { waitlist, joinWaitlist, leaveWaitlist, bookedTimesFor } = useBookings();
   const days = nextNDates(3);
   const dist = [62, 26, 8, 3, 1]; // 5★ → 1★ distribution %
+  const { reviewsFor } = useReviews();
+  const liveReviews = reviewsFor(barber.slug);
 
   const isWaitlisted = (dateISO: string, time: string) =>
     waitlist.some((w) => w.barberSlug === barber.slug && w.dateISO === dateISO && w.time === time);
