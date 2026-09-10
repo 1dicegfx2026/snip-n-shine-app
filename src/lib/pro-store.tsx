@@ -11,6 +11,8 @@ interface ProStore {
   getPage: (handle: string) => ProPage | undefined;
   savePage: (page: ProPage) => Promise<void>;
   removePage: (handle: string) => Promise<void>;
+  /** ¿El usuario firmado es dueño de esta página? */
+  ownsPage: (handle: string) => boolean;
 }
 
 const Ctx = createContext<ProStore | null>(null);
@@ -52,6 +54,7 @@ export function ProProvider({ children }: { children: ReactNode }) {
       ? rows.filter((r) => r.owner_id === user.id).map((r) => ({ ...r.data, handle: r.handle }))
       : [],
     getPage: (handle) => pages.find((p) => p.handle === handle),
+    ownsPage: (handle) => !!user && rows.some((r) => r.handle === handle && r.owner_id === user.id),
     savePage: async (page) => {
       if (!user) throw new Error("Tienes que iniciar sesión");
       const existing = rows.find((r) => r.handle === page.handle);

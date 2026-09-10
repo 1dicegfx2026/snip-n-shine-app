@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useReviews } from "@/lib/review-store";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
+import { ReviewReply } from "@/components/ReviewReply";
 
 export const Route = createFileRoute("/barber/$slug")({
   loader: ({ params }) => {
@@ -184,6 +185,13 @@ function BarberProfile() {
                   {r.comment && (
                     <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{r.comment}</p>
                   )}
+                  <ReviewReply
+                    reviewId={r.id}
+                    barberSlug={barber.slug}
+                    reply={r.reply}
+                    replyAt={r.replyAt}
+                    barberName={barber.name}
+                  />
                 </article>
               ))}
               {barber.reviews.map((r) => (

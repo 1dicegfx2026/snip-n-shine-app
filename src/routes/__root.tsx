@@ -17,6 +17,7 @@ import { SiteProvider } from "../lib/site-store";
 import { ProProvider } from "../lib/pro-store";
 import { ClientProvider } from "../lib/client-store";
 import { ReviewProvider } from "../lib/review-store";
+import { NotificationProvider } from "../lib/notification-store";
 import { AuthProvider } from "../lib/auth";
 
 import { Header } from "../components/Header";
@@ -145,6 +146,7 @@ function RootComponent() {
           <ClientProvider>
             <BookingProvider>
               <ReviewProvider>
+              <NotificationProvider>
               <div className="flex min-h-screen flex-col">
                 <Header />
                 <main className="flex-1">
@@ -153,6 +155,7 @@ function RootComponent() {
                 <Footer />
               </div>
               <Toaster theme="dark" position="bottom-right" richColors />
+              </NotificationProvider>
               </ReviewProvider>
             </BookingProvider>
           </ClientProvider>

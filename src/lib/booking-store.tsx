@@ -2,8 +2,15 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { DEPOSIT_RATE, getBarber } from "@/lib/data/barbers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { pushNotification } from "@/lib/notification-store";
 
-export type BookingStatus = "upcoming" | "arrived" | "completed" | "cancelled" | "refunded";
+export type BookingStatus =
+  | "upcoming"
+  | "arrived"
+  | "completed"
+  | "cancelled"
+  | "refunded"
+  | "no_show";
 
 export interface Booking {
   id: string;
@@ -47,6 +54,8 @@ interface Store {
   /** El barbero marca que el cliente llegó: se cobra el resto antes de recortar */
   markArrived: (id: string) => void;
   completeBooking: (id: string) => void;
+  /** El cliente no apareció a su cita */
+  markNoShow: (id: string) => void;
   cancelBooking: (id: string) => Promise<void>;
   refundBooking: (id: string) => Promise<void>;
   /** Admin: cambia estado y montos a mano */
@@ -84,6 +93,27 @@ interface Row {
   total: number | string;
   status: string;
   created_at: string;
+}
+
+/** Avisa a la gente en lista de espera cuando se libera un cupo. */
+async function notifyWaitlist(barberSlug: string, dateISO: string, time: string) {
+  const { data } = await supabase
+    .from("waitlist")
+    .select("id, client_id")
+    .eq("barber_slug", barberSlug)
+    .eq("date_iso", dateISO)
+    .eq("time", time);
+  const rows = (data ?? []) as { id: string; client_id: string | null }[];
+  const barber = getBarber(barberSlug);
+  for (const row of rows) {
+    if (!row.client_id) continue;
+    await pushNotification({
+      userId: row.client_id,
+      title: "¡Se liberó tu cupo!",
+      body: `${barber?.name ?? barberSlug} tiene libre el ${dateISO} a las ${time}. Reserva antes de que lo tomen.`,
+      link: `/book/${barberSlug}`,
+    });
+  }
 }
 
 const n = (v: number | string) => (typeof v === "number" ? v : Number(v));
@@ -259,6 +289,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       patch(id, { status: "arrived", amountPaid: total }, { status: "arrived", amount_paid: total });
     },
     completeBooking: (id) => patch(id, { status: "completed" }, { status: "completed" }),
+    markNoShow: (id) => patch(id, { status: "no_show" }, { status: "no_show" }),
     cancelBooking: async (id) => {
       const b = bookings.find((x) => x.id === id);
       const refunded = b?.amountPaid ?? 0;
@@ -267,6 +298,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         { status: "cancelled", amountPaid: 0, refunded },
         { status: "cancelled", amount_paid: 0, refunded },
       );
+      if (b) void notifyWaitlist(b.barberSlug, b.dateISO, b.time);
     },
     refundBooking: async (id) => {
       const b = bookings.find((x) => x.id === id);
