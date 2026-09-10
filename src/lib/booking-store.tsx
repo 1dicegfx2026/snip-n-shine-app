@@ -209,22 +209,32 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       return booking;
     },
     updateBooking: async (id, patch) => {
-      const dbPatch: Record<string, string | null> = {};
-      if (patch.serviceId !== undefined) dbPatch.service_id = patch.serviceId;
-      if (patch.dateISO !== undefined) dbPatch.date_iso = patch.dateISO;
-      if (patch.time !== undefined) dbPatch.time = patch.time;
-      if (patch.name !== undefined) dbPatch.name = patch.name;
-      if (patch.payType !== undefined) dbPatch.pay_type = patch.payType;
-      if (patch.payMethod !== undefined) dbPatch.pay_method = patch.payMethod ?? null;
+      const dbPatch: {
+        service_id?: string;
+        date_iso?: string;
+        time?: string;
+        name?: string;
+        pay_type?: string;
+        pay_method?: string | null;
+        total?: number;
+      } = {};
+      if (patch.serviceId !== undefined) dbPatch["service_id"] = patch.serviceId;
+      if (patch.dateISO !== undefined) dbPatch["date_iso"] = patch.dateISO;
+      if (patch.time !== undefined) dbPatch["time"] = patch.time;
+      if (patch.name !== undefined) dbPatch["name"] = patch.name;
+      if (patch.payType !== undefined) dbPatch["pay_type"] = patch.payType;
+      if (patch.payMethod !== undefined) dbPatch["pay_method"] = patch.payMethod ?? null;
+
       setBookings((prev) =>
         prev.map((b) => {
           if (b.id !== id) return b;
-          const next = { ...b, ...patch };
-          const svc = patch.serviceId ? undefined : b.serviceId;
-          const barberSlug = b.barberSlug;
-          const barber = (await import("@/lib/data/barbers")).getBarber(barberSlug);
+          const next: Booking = { ...b, ...patch };
+          const barber = getBarber(next.barberSlug);
           const service = barber?.services.find((s) => s.id === next.serviceId);
-          if (service) next.total = service.price;
+          if (service) {
+            next.total = service.price;
+            dbPatch["total"] = service.price;
+          }
           return next;
         }),
       );
