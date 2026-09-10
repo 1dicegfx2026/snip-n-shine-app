@@ -231,6 +231,14 @@ function BookingFlow() {
                   />
                 </div>
 
+                {offline ? (
+                  <div className="rounded-xl border border-gold/40 bg-gold/5 p-4">
+                    <p className="text-sm font-bold text-gold">Pagas ${total} sin tarjeta</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Hoy no se cobra nada. El barbero confirma tu pago cuando llegues a la cita.
+                    </p>
+                  </div>
+                ) : (
                 <div className="grid gap-2 sm:grid-cols-2">
                   <button
                     onClick={() => setPayType("deposit")}
@@ -253,6 +261,8 @@ function BookingFlow() {
                     <p className="mt-0.5 text-xs text-muted-foreground">Skip the counter entirely.</p>
                   </button>
                 </div>
+                )}
+
 
                 <div className="rounded-lg border border-dashed border-border bg-background p-4">
                   <p className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
