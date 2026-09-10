@@ -45,6 +45,13 @@ function ClassesPage() {
         lo que vales. Pagas por clase y recibes el enlace.
       </p>
 
+      <Link
+        to="/live"
+        className="mt-5 inline-flex items-center gap-2 rounded-xl border border-gold px-4 py-2 text-sm font-bold text-gold hover:bg-gold/10"
+      >
+        <Radio size={15} /> Ver quién está en vivo ahora
+      </Link>
+
       <div className="mt-6 flex flex-wrap gap-2">
         {platforms.map((pf) => (
           <button
