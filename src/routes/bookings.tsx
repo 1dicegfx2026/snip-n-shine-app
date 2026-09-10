@@ -5,6 +5,7 @@ import { getBarber, formatDateLong, getSlots, nextNDates } from "@/lib/data/barb
 import { useBookings } from "@/lib/booking-store";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { useAdmin } from "@/lib/admin";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/bookings")({
@@ -33,27 +34,39 @@ function BookingEditCard({
   booking: ReturnType<typeof useBookings>["bookings"][number];
   onDone: () => void;
 }) {
-  const { updateBooking, bookedTimesFor } = useBookings();
+  const { updateBooking, adminPatch, bookedTimesFor } = useBookings();
+  const admin = useAdmin();
   const barber = getBarber(booking.barberSlug);
   const days = useMemo(() => nextNDates(14), []);
   const [serviceId, setServiceId] = useState(booking.serviceId);
   const [dateISO, setDateISO] = useState(booking.dateISO);
   const [time, setTime] = useState(booking.time);
+  const [customTotal, setCustomTotal] = useState(String(booking.total));
   const [saving, setSaving] = useState(false);
 
   if (!barber) return null;
   const service = barber.services.find((s) => s.id === serviceId);
   const slots = dateISO ? getSlots(barber, dateISO, bookedTimesFor(barber.slug, dateISO)) : [];
+  const serviceTotal = service?.price ?? booking.total;
+  const enteredTotal = Number(customTotal);
+  const newTotal = admin.canEdit && Number.isFinite(enteredTotal) ? enteredTotal : serviceTotal;
+  const balance = Math.max(0, newTotal - booking.amountPaid);
+  const refundDue = Math.max(0, booking.amountPaid - newTotal);
 
   const handleSave = async () => {
     if (!serviceId || !dateISO || !time) {
       toast.error("Elige servicio, día y hora.");
       return;
     }
+    if (admin.canEdit && (!Number.isFinite(enteredTotal) || enteredTotal < 0)) {
+      toast.error("Escribe un precio válido.");
+      return;
+    }
     setSaving(true);
     try {
       await updateBooking(booking.id, { serviceId, dateISO, time });
-      toast.success("Cita actualizada y guardada.");
+      if (admin.canEdit) await adminPatch(booking.id, { total: enteredTotal });
+      toast.success(admin.canEdit ? "Cita y precio actualizados." : "Cita actualizada y guardada.");
       onDone();
     } catch {
       toast.error("No se pudo guardar el cambio. Inténtalo otra vez.");
@@ -78,7 +91,12 @@ function BookingEditCard({
             <label className="text-xs font-semibold text-muted-foreground">Servicio</label>
             <select
               value={serviceId}
-              onChange={(e) => setServiceId(e.target.value)}
+              onChange={(e) => {
+                const nextServiceId = e.target.value;
+                setServiceId(nextServiceId);
+                const nextService = barber.services.find((item) => item.id === nextServiceId);
+                if (nextService) setCustomTotal(String(nextService.price));
+              }}
               className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
             >
               {barber.services.map((s) => (
@@ -139,9 +157,39 @@ function BookingEditCard({
               </div>
             </div>
           )}
-          <div className="flex items-center justify-between rounded-lg bg-gold/5 p-3 text-sm">
-            <span className="text-muted-foreground">Nuevo total</span>
-            <span className="font-bold text-gold">${service?.price ?? booking.total}</span>
+          {admin.canEdit && (
+            <div>
+              <label htmlFor={`booking-price-${booking.id}`} className="text-xs font-semibold text-muted-foreground">
+                Precio acordado ($)
+              </label>
+              <input
+                id={`booking-price-${booking.id}`}
+                type="number"
+                min="0"
+                step="0.01"
+                inputMode="decimal"
+                value={customTotal}
+                onChange={(event) => setCustomTotal(event.target.value)}
+                className="mt-1 w-full rounded-lg border border-gold/50 bg-background px-3 py-2 text-sm font-bold text-gold"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Precio normal del servicio: ${serviceTotal.toFixed(2)}. Solo el equipo puede cambiar el precio final.
+              </p>
+            </div>
+          )}
+          <div className="space-y-2 rounded-lg bg-gold/5 p-3 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Nuevo total</span>
+              <span className="font-bold text-gold">${newTotal.toFixed(2)}</span>
+            </div>
+            {admin.canEdit && (
+              <div className="flex items-center justify-between border-t border-border pt-2 text-xs">
+                <span className="text-muted-foreground">{refundDue > 0 ? "Devolución pendiente" : "Saldo pendiente"}</span>
+                <span className={refundDue > 0 ? "font-bold text-destructive" : "font-bold text-foreground"}>
+                  ${(refundDue > 0 ? refundDue : balance).toFixed(2)}
+                </span>
+              </div>
+            )}
           </div>
           <div className="flex gap-2">
             <button
