@@ -46,13 +46,21 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
-const STATUSES: BookingStatus[] = ["upcoming", "arrived", "completed", "cancelled", "refunded"];
+const STATUSES: BookingStatus[] = [
+  "upcoming",
+  "arrived",
+  "completed",
+  "cancelled",
+  "refunded",
+  "no_show",
+];
 const STATUS_ES: Record<BookingStatus, string> = {
   upcoming: "Próxima",
   arrived: "Llegó",
   completed: "Completada",
   cancelled: "Cancelada",
   refunded: "Devuelta",
+  no_show: "No apareció",
 };
 
 const money = (v: number) => `$${v.toFixed(2)}`;
