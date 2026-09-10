@@ -216,7 +216,7 @@ function BookingFlow() {
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Jordan Rivers"
+                     placeholder="Escribe tu nombre completo"
                     className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-2.5 text-sm focus:border-gold focus:outline-none"
                   />
                 </div>
@@ -318,8 +318,14 @@ function BookingFlow() {
               </div>
             </div>
             <button
-              disabled={!canConfirm}
               onClick={() => {
+                 if (!canConfirm) {
+                   toast.error(`Para confirmar te falta: ${missing.join(", ")}.`);
+                   if (!name.trim() && time && service) {
+                     document.getElementById("name")?.focus();
+                   }
+                   return;
+                 }
                 if (!service) return;
                 addBooking({
                   barberSlug: barber.slug,
@@ -338,7 +344,12 @@ function BookingFlow() {
                 toast.success("Appointment confirmed — see you in the chair.");
                 window.scrollTo({ top: 0 });
               }}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 font-display text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/85 disabled:cursor-not-allowed disabled:opacity-40"
+               aria-disabled={!canConfirm}
+               className={`mt-5 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3.5 font-display text-sm font-bold transition-colors ${
+                 canConfirm
+                   ? "bg-primary text-primary-foreground hover:bg-primary/85"
+                   : "border border-gold/50 bg-gold/10 text-gold hover:bg-gold/15"
+               }`}
             >
               Confirm booking <ArrowRight size={16} />
             </button>
