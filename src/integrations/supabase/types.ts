@@ -119,6 +119,36 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          link: string
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          link?: string
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          link?: string
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           announcement: string
@@ -228,6 +258,8 @@ export type Database = {
           created_at: string
           id: string
           rating: number
+          reply: string
+          reply_at: string | null
           service_name: string
         }
         Insert: {
@@ -239,6 +271,8 @@ export type Database = {
           created_at?: string
           id?: string
           rating: number
+          reply?: string
+          reply_at?: string | null
           service_name?: string
         }
         Update: {
@@ -250,6 +284,8 @@ export type Database = {
           created_at?: string
           id?: string
           rating?: number
+          reply?: string
+          reply_at?: string | null
           service_name?: string
         }
         Relationships: [
