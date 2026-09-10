@@ -422,6 +422,64 @@ function BookingsPage() {
             </>
           )}
 
+          {past.length > 0 && (
+            <>
+              <h2 className="pt-4 font-display text-lg font-bold">Historial</h2>
+              {past.map((b) => {
+                const barber = getBarber(b.barberSlug);
+                const service = barber?.services.find((s) => s.id === b.serviceId);
+                if (!barber) return null;
+                const existing = reviewFor(b.id);
+                return (
+                  <div key={b.id} className="rounded-xl border border-border bg-card p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="font-display font-bold">{service?.name ?? "Cita"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {barber.name} · {formatDateLong(b.dateISO)} · ${b.total}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Link
+                          to="/book/$slug"
+                          params={{ slug: barber.slug }}
+                          search={{ service: b.serviceId, date: "", time: "" }}
+                          className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/85"
+                        >
+                          <CalendarPlus size={13} /> Reservar igual
+                        </Link>
+                        {existing ? (
+                          <span className="inline-flex items-center gap-1 rounded-lg border border-gold/40 bg-gold/10 px-3 py-2 text-xs font-bold text-gold">
+                            <Star size={13} className="fill-gold" /> {existing.rating}/5 reseñado
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setReviewingId(reviewingId === b.id ? null : b.id)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-gold/40 px-3 py-2 text-xs font-bold text-gold hover:bg-gold/10"
+                          >
+                            <Star size={13} /> Dejar reseña
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {reviewingId === b.id && !existing && (
+                      <div className="mt-4">
+                        <ReviewForm
+                          bookingId={b.id}
+                          barberSlug={b.barberSlug}
+                          authorName={b.name}
+                          serviceName={service?.name ?? ""}
+                          onDone={() => setReviewingId(null)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </>
+          )}
+
           {cancelled.length > 0 && (
             <>
               <h2 className="pt-4 font-display text-lg font-bold text-muted-foreground">Cancelled</h2>
