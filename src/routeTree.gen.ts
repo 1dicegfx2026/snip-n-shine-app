@@ -26,6 +26,7 @@ import { Route as BarberSlugRouteImport } from './routes/barber.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
 import { Route as CelebritySlugRouteImport } from './routes/celebrity.$slug'
 import { Route as CelebrityNewRouteImport } from './routes/celebrity.new'
+import { Route as LiveIndexRouteImport } from './routes/live.index'
 import { Route as ProHandleRouteImport } from './routes/pro.$handle'
 import { Route as ProNewRouteImport } from './routes/pro.new'
 import { Route as UHandleRouteImport } from './routes/u.$handle'
@@ -116,6 +117,11 @@ const CelebrityNewRoute = CelebrityNewRouteImport.update({
   path: '/celebrity/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LiveIndexRoute = LiveIndexRouteImport.update({
+  id: '/live/',
+  path: '/live/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProHandleRoute = ProHandleRouteImport.update({
   id: '/pro/$handle',
   path: '/pro/$handle',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/pro/new': typeof ProNewRoute
   '/u/$handle': typeof UHandleRoute
   '/u/new': typeof UNewRoute
+  '/live/': typeof LiveIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/pro/new': typeof ProNewRoute
   '/u/$handle': typeof UHandleRoute
   '/u/new': typeof UNewRoute
+  '/live': typeof LiveIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/pro/new': typeof ProNewRoute
   '/u/$handle': typeof UHandleRoute
   '/u/new': typeof UNewRoute
+  '/live/': typeof LiveIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/pro/new'
     | '/u/$handle'
     | '/u/new'
+    | '/live/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
     | '/pro/new'
     | '/u/$handle'
     | '/u/new'
+    | '/live'
   id:
     | '__root__'
     | '/'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/pro/new'
     | '/u/$handle'
     | '/u/new'
+    | '/live/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -301,6 +313,7 @@ export interface RootRouteChildren {
   ProNewRoute: typeof ProNewRoute
   UHandleRoute: typeof UHandleRoute
   UNewRoute: typeof UNewRoute
+  LiveIndexRoute: typeof LiveIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -424,6 +437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CelebrityNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/live/': {
+      id: '/live/'
+      path: '/live'
+      fullPath: '/live/'
+      preLoaderRoute: typeof LiveIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pro/$handle': {
       id: '/pro/$handle'
       path: '/pro/$handle'
@@ -477,6 +497,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProNewRoute: ProNewRoute,
   UHandleRoute: UHandleRoute,
   UNewRoute: UNewRoute,
+  LiveIndexRoute: LiveIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

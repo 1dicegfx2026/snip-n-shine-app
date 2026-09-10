@@ -3,7 +3,7 @@ import { Radio, Users, Video, Play } from "lucide-react";
 import { useLive } from "@/lib/live-store";
 import { SponsorBanner } from "@/components/SponsorBanner";
 
-export const Route = createFileRoute("/live")({
+export const Route = createFileRoute("/live/")({
   head: () => ({
     meta: [
       { title: "En vivo ahora — GILT" },
