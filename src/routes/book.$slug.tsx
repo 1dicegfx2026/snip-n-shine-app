@@ -1,6 +1,7 @@
 import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePlatformSettings } from "@/lib/platform-settings";
 import { ArrowLeft, ArrowRight, Check, CreditCard, ShieldCheck, PartyPopper } from "lucide-react";
 import { getBarber, getSlots, nextNDates, formatDateLong } from "@/lib/data/barbers";
 import { BASE_COMMISSION } from "@/lib/data/pro-pages";
