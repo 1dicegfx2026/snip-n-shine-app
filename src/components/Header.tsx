@@ -3,6 +3,7 @@ import { CalendarDays, ExternalLink, LayoutDashboard, LogIn, LogOut, Star } from
 import { useBookings } from "@/lib/booking-store";
 import { useAuth } from "@/lib/auth";
 import { usePlatformSettings } from "@/lib/platform-settings";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export function Header() {
   const { bookings } = useBookings();
@@ -94,6 +95,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <NotificationBell />
           {user ? (
             <button
               type="button"
