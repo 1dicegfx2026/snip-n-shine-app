@@ -1,6 +1,10 @@
 import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarX, BellRing, Hourglass, CalendarPlus, ArrowRight, Pencil, X, Check, Eye, MapPin, CreditCard, AlertTriangle } from "lucide-react";
+import { CalendarX, BellRing, Hourglass, CalendarPlus, ArrowRight, Pencil, X, Check, Eye, MapPin, CreditCard, AlertTriangle, CalendarDays, Trophy, Star } from "lucide-react";
+import { downloadICS } from "@/lib/calendar";
+import { ReviewForm } from "@/components/ReviewForm";
+import { ShareButton } from "@/components/ShareButton";
+import { useReviews } from "@/lib/review-store";
 import { getBarber, formatDateLong, getSlots, nextNDates } from "@/lib/data/barbers";
 import { useBookings } from "@/lib/booking-store";
 import { toast } from "sonner";
