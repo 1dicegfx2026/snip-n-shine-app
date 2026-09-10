@@ -31,6 +31,7 @@ export type Database = {
           service_id: string
           status: string
           time: string
+          tip: number
           total: number
         }
         Insert: {
@@ -49,6 +50,7 @@ export type Database = {
           service_id: string
           status?: string
           time: string
+          tip?: number
           total?: number
         }
         Update: {
@@ -67,6 +69,7 @@ export type Database = {
           service_id?: string
           status?: string
           time?: string
+          tip?: number
           total?: number
         }
         Relationships: []
@@ -92,6 +95,27 @@ export type Database = {
           handle?: string
           owner_id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          barber_slug: string
+          client_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          barber_slug: string
+          client_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          barber_slug?: string
+          client_id?: string
+          created_at?: string
+          id?: string
         }
         Relationships: []
       }
@@ -193,6 +217,50 @@ export type Database = {
           plan?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          author_name: string
+          barber_slug: string
+          booking_id: string | null
+          client_id: string
+          comment: string
+          created_at: string
+          id: string
+          rating: number
+          service_name: string
+        }
+        Insert: {
+          author_name?: string
+          barber_slug: string
+          booking_id?: string | null
+          client_id: string
+          comment?: string
+          created_at?: string
+          id?: string
+          rating: number
+          service_name?: string
+        }
+        Update: {
+          author_name?: string
+          barber_slug?: string
+          booking_id?: string | null
+          client_id?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          service_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
