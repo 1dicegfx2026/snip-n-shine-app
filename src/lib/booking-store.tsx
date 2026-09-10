@@ -40,6 +40,10 @@ interface Store {
   addBooking: (
     b: Omit<Booking, "id" | "createdAt" | "status" | "refunded" | "clientId">,
   ) => Booking;
+  updateBooking: (
+    id: string,
+    patch: Partial<Pick<Booking, "serviceId" | "dateISO" | "time" | "name" | "payType" | "payMethod">>,
+  ) => Promise<void>;
   /** El barbero marca que el cliente llegó: se cobra el resto antes de recortar */
   markArrived: (id: string) => void;
   completeBooking: (id: string) => void;
