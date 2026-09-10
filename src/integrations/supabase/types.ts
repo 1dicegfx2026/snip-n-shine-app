@@ -95,6 +95,51 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings: {
+        Row: {
+          announcement: string
+          bookings_open: boolean
+          commission_rate: number
+          created_at: string
+          default_deposit_rate: number
+          id: string
+          pay_card: boolean
+          pay_cash: boolean
+          pay_cashapp: boolean
+          pay_zelle: boolean
+          support_email: string
+          updated_at: string
+        }
+        Insert: {
+          announcement?: string
+          bookings_open?: boolean
+          commission_rate?: number
+          created_at?: string
+          default_deposit_rate?: number
+          id?: string
+          pay_card?: boolean
+          pay_cash?: boolean
+          pay_cashapp?: boolean
+          pay_zelle?: boolean
+          support_email?: string
+          updated_at?: string
+        }
+        Update: {
+          announcement?: string
+          bookings_open?: boolean
+          commission_rate?: number
+          created_at?: string
+          default_deposit_rate?: number
+          id?: string
+          pay_card?: boolean
+          pay_cash?: boolean
+          pay_cashapp?: boolean
+          pay_zelle?: boolean
+          support_email?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pro_pages: {
         Row: {
           created_at: string
@@ -216,7 +261,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "moderator" | "support"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -344,7 +389,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "moderator", "support"],
     },
   },
 } as const

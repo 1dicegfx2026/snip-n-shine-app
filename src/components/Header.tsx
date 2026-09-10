@@ -2,16 +2,23 @@ import { Link } from "@tanstack/react-router";
 import { CalendarDays, ExternalLink, LayoutDashboard, LogIn, LogOut, Star } from "lucide-react";
 import { useBookings } from "@/lib/booking-store";
 import { useAuth } from "@/lib/auth";
+import { usePlatformSettings } from "@/lib/platform-settings";
 
 export function Header() {
   const { bookings } = useBookings();
   const { user, displayName, signOut } = useAuth();
+  const { settings } = usePlatformSettings();
   const upcoming = bookings.filter(
     (b) => b.status === "upcoming" && b.clientId === user?.id,
   ).length;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
+      {settings.announcement.trim() !== "" && (
+        <div className="bg-gold px-4 py-1.5 text-center text-xs font-bold text-gold-foreground">
+          {settings.announcement}
+        </div>
+      )}
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-3">
           <img

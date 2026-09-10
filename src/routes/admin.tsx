@@ -5,7 +5,8 @@ import { useSite } from "@/lib/site-store";
 import { useBookings, type BookingStatus } from "@/lib/booking-store";
 import { usePros } from "@/lib/pro-store";
 import { useClients } from "@/lib/client-store";
-import { useAdmin } from "@/lib/admin";
+import { useAdmin, ROLE_ES, STAFF_ROLES, type StaffRole } from "@/lib/admin";
+import { usePlatformSettings } from "@/lib/platform-settings";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -31,13 +32,14 @@ export const Route = createFileRoute("/admin")({
 });
 
 const TABS = [
-  { id: "citas", label: "Citas" },
-  { id: "barberos", label: "Barberos" },
-  { id: "clientes", label: "Clientes" },
-  { id: "usuarios", label: "Usuarios" },
-  { id: "sponsors", label: "Sponsors" },
-  { id: "anuncios", label: "Anuncios" },
-  { id: "solicitudes", label: "Solicitudes" },
+  { id: "citas", label: "Citas", adminOnly: false },
+  { id: "barberos", label: "Barberos", adminOnly: false },
+  { id: "clientes", label: "Clientes", adminOnly: false },
+  { id: "usuarios", label: "Usuarios", adminOnly: true },
+  { id: "sponsors", label: "Sponsors", adminOnly: false },
+  { id: "anuncios", label: "Anuncios", adminOnly: false },
+  { id: "solicitudes", label: "Solicitudes", adminOnly: false },
+  { id: "ajustes", label: "Ajustes", adminOnly: true },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -72,11 +74,11 @@ function AdminPage() {
     return <Gate title="Panel de control" text="Cargando tu acceso…" />;
   }
 
-  if (!admin.isAdmin) {
+  if (!admin.isStaff) {
     return (
       <Gate
         title="Panel de control"
-        text="Esta cuenta todavía no es administradora. Si eres el dueño y nadie ha reclamado el acceso, tómalo aquí."
+        text="Esta cuenta todavía no es del equipo. Si eres el dueño y nadie ha reclamado el acceso, tómalo aquí."
         action={
           <button
             onClick={async () => {
@@ -100,13 +102,21 @@ function AdminPage() {
       <h1 className="mt-2 font-display text-4xl font-extrabold">Panel de control</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         Desde aquí editas, cancelas, devuelves y borras cualquier cosa: citas, pagos, barberos,
-        clientes, usuarios, sponsors y la publicidad de la portada.
+        clientes, usuarios, sponsors, publicidad, comisiones y el equipo.
       </p>
+      <p className="mt-2 text-xs font-bold tracking-widest text-gold">
+        TU ACCESO: {admin.roles.map((r) => ROLE_ES[r]).join(" · ").toUpperCase()}
+      </p>
+      {!admin.canEdit && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Como ayudante puedes ver todo, pero los cambios los guarda un admin o moderador.
+        </p>
+      )}
 
       <Overview />
 
       <nav className="mt-8 flex flex-wrap gap-2">
-        {TABS.map((t) => (
+        {TABS.filter((t) => admin.isAdmin || !t.adminOnly).map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
@@ -129,6 +139,7 @@ function AdminPage() {
         {tab === "sponsors" && <SponsorsPanel />}
         {tab === "anuncios" && <SlidesPanel />}
         {tab === "solicitudes" && <RequestsPanel />}
+        {tab === "ajustes" && admin.isAdmin && <SettingsPanel />}
       </div>
     </div>
   );
@@ -452,20 +463,45 @@ function ClientsPanel() {
 /* ---------------- Usuarios ---------------- */
 
 function UsersPanel({ admin }: { admin: ReturnType<typeof useAdmin> }) {
+  const [q, setQ] = useState("");
+  const list = admin.users.filter((u) =>
+    q.trim() ? u.displayName.toLowerCase().includes(q.trim().toLowerCase()) : true,
+  );
+  const staff = admin.users.filter((u) => u.roles.length > 0);
+
+  const toggleRole = async (id: string, role: StaffRole, value: boolean) => {
+    try {
+      await admin.setRole(id, role, value);
+      toast.success(value ? `Ahora es ${ROLE_ES[role].toLowerCase()}.` : "Permiso quitado.");
+    } catch {
+      toast.error("No se pudo cambiar el permiso.");
+    }
+  };
+
   return (
     <section className="rounded-xl border border-gold/30 bg-card p-5">
       <h2 className="font-display text-lg font-bold">Usuarios ({admin.users.length})</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Dale acceso gratis a quien quieras, cámbiale el plan o hazlo administrador.
+        Da cuentas gratis, cambia planes y arma tu equipo: administrador (todo), moderador (edita
+        citas y perfiles) y ayudante (solo mira).
       </p>
+      <p className="mt-1 text-xs text-gold">Equipo actual: {staff.length}</p>
+
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Buscar por nombre…"
+        className="mt-4 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm sm:max-w-xs"
+      />
+
       <div className="mt-4 space-y-2">
-        {admin.users.map((u) => (
+        {list.map((u) => (
           <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-border p-3">
             <div className="min-w-0 flex-1">
               <p className="truncate font-semibold">{u.displayName}</p>
               <p className="truncate text-xs text-muted-foreground">
                 {u.freeAccess ? "Acceso gratis" : "Paga normal"} · plan {u.plan}
-                {u.isAdmin ? " · admin" : ""}
+                {u.roles.length ? ` · ${u.roles.map((r) => ROLE_ES[r]).join(", ")}` : ""}
               </p>
             </div>
             <select
@@ -484,14 +520,188 @@ function UsersPanel({ admin }: { admin: ReturnType<typeof useAdmin> }) {
             >
               Gratis
             </button>
-            <button
-              onClick={() => void admin.setAdmin(u.id, !u.isAdmin)}
-              className={`rounded-lg border border-border px-3 py-1.5 text-xs font-bold ${u.isAdmin ? "text-gold" : "text-muted-foreground"}`}
-            >
-              Admin
-            </button>
+            {STAFF_ROLES.map((role) => {
+              const has = u.roles.includes(role);
+              return (
+                <button
+                  key={role}
+                  onClick={() => void toggleRole(u.id, role, !has)}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${
+                    has ? "border-gold text-gold" : "border-border text-muted-foreground"
+                  }`}
+                >
+                  {ROLE_ES[role]}
+                </button>
+              );
+            })}
           </div>
         ))}
+        {list.length === 0 && (
+          <p className="text-sm text-muted-foreground">No hay usuarios con ese nombre.</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Ajustes ---------------- */
+
+function SettingsPanel() {
+  const { settings, loading, save } = usePlatformSettings();
+  const [commission, setCommission] = useState("");
+  const [deposit, setDeposit] = useState("");
+  const [announcement, setAnnouncement] = useState("");
+  const [email, setEmail] = useState("");
+  const [ready, setReady] = useState(false);
+
+  if (!loading && !ready) {
+    setReady(true);
+    setCommission(String(Math.round(settings.commissionRate * 100)));
+    setDeposit(String(Math.round(settings.defaultDepositRate * 100)));
+    setAnnouncement(settings.announcement);
+    setEmail(settings.supportEmail);
+  }
+
+  const run = async (patch: Parameters<typeof save>[0], msg: string) => {
+    try {
+      await save(patch);
+      toast.success(msg);
+    } catch {
+      toast.error("No se pudo guardar.");
+    }
+  };
+
+  const methods: { key: keyof typeof settings; label: string }[] = [
+    { key: "payCard", label: "Tarjeta" },
+    { key: "payZelle", label: "Zelle" },
+    { key: "payCashapp", label: "Cash App" },
+    { key: "payCash", label: "Efectivo" },
+  ];
+
+  return (
+    <section className="rounded-xl border border-gold/30 bg-card p-5">
+      <h2 className="font-display text-lg font-bold">Ajustes de la plataforma</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Lo que cambies aquí manda en toda la app: tu comisión, el depósito por defecto, los métodos
+        de pago disponibles y el mensaje de la portada.
+      </p>
+
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div>
+          <p className="text-xs font-bold text-muted-foreground">Tu comisión por corte (%)</p>
+          <div className="mt-1 flex gap-2">
+            <input
+              value={commission}
+              onChange={(e) => setCommission(e.target.value)}
+              inputMode="decimal"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+            />
+            <button
+              onClick={() =>
+                void run({ commissionRate: (Number(commission) || 0) / 100 }, "Comisión guardada.")
+              }
+              className="rounded-lg bg-gold px-4 py-2 text-xs font-bold text-gold-foreground"
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs font-bold text-muted-foreground">Depósito por defecto (%)</p>
+          <div className="mt-1 flex gap-2">
+            <input
+              value={deposit}
+              onChange={(e) => setDeposit(e.target.value)}
+              inputMode="decimal"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+            />
+            <button
+              onClick={() =>
+                void run(
+                  { defaultDepositRate: (Number(deposit) || 0) / 100 },
+                  "Depósito guardado.",
+                )
+              }
+              className="rounded-lg bg-gold px-4 py-2 text-xs font-bold text-gold-foreground"
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
+
+        <div className="sm:col-span-2">
+          <p className="text-xs font-bold text-muted-foreground">Mensaje de anuncio (portada)</p>
+          <div className="mt-1 flex gap-2">
+            <input
+              value={announcement}
+              onChange={(e) => setAnnouncement(e.target.value)}
+              placeholder="Ej: 20% off esta semana en todos los fades"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+            />
+            <button
+              onClick={() => void run({ announcement }, "Anuncio guardado.")}
+              className="rounded-lg bg-gold px-4 py-2 text-xs font-bold text-gold-foreground"
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
+
+        <div className="sm:col-span-2">
+          <p className="text-xs font-bold text-muted-foreground">Email de soporte</p>
+          <div className="mt-1 flex gap-2">
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="soporte@gilt.app"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+            />
+            <button
+              onClick={() => void run({ supportEmail: email }, "Email guardado.")}
+              className="rounded-lg bg-gold px-4 py-2 text-xs font-bold text-gold-foreground"
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <p className="text-xs font-bold text-muted-foreground">Métodos de pago activos</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {methods.map((m) => {
+            const on = Boolean(settings[m.key]);
+            return (
+              <button
+                key={String(m.key)}
+                onClick={() => void run({ [m.key]: !on }, `${m.label} ${on ? "apagado" : "activo"}.`)}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${
+                  on ? "border-gold text-gold" : "border-border text-muted-foreground"
+                }`}
+              >
+                {m.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <p className="text-xs font-bold text-muted-foreground">Reservas</p>
+        <button
+          onClick={() =>
+            void run(
+              { bookingsOpen: !settings.bookingsOpen },
+              settings.bookingsOpen ? "Reservas cerradas." : "Reservas abiertas.",
+            )
+          }
+          className={`mt-2 rounded-lg border px-4 py-2 text-xs font-bold ${
+            settings.bookingsOpen ? "border-gold text-gold" : "border-border text-muted-foreground"
+          }`}
+        >
+          {settings.bookingsOpen ? "Abiertas (tocar para cerrar)" : "Cerradas (tocar para abrir)"}
+        </button>
       </div>
     </section>
   );

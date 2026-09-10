@@ -1,6 +1,7 @@
 import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePlatformSettings } from "@/lib/platform-settings";
 import { ArrowLeft, ArrowRight, Check, CreditCard, ShieldCheck, PartyPopper } from "lucide-react";
 import { getBarber, getSlots, nextNDates, formatDateLong } from "@/lib/data/barbers";
 import { BASE_COMMISSION } from "@/lib/data/pro-pages";
@@ -44,6 +45,20 @@ function BookingFlow() {
   const [payType, setPayType] = useState<"deposit" | "full">("deposit");
   const [payMethod, setPayMethod] = useState<PayMethod>("card");
   const [confirmed, setConfirmed] = useState(false);
+
+  const { settings } = usePlatformSettings();
+  const enabledPay = useMemo<PayMethod[]>(() => {
+    const list: PayMethod[] = [];
+    if (settings.payCard) list.push("card");
+    if (settings.payZelle) list.push("zelle");
+    if (settings.payCashapp) list.push("cashapp");
+    if (settings.payCash) list.push("cash");
+    return list.length ? list : ["card"];
+  }, [settings]);
+
+  useEffect(() => {
+    if (!enabledPay.includes(payMethod)) setPayMethod(enabledPay[0] as PayMethod);
+  }, [enabledPay, payMethod]);
 
   const service = barber.services.find((s) => s.id === serviceId);
   const days = useMemo(() => nextNDates(14), []);
@@ -269,7 +284,7 @@ function BookingFlow() {
                     <CreditCard size={14} /> Método de pago
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {PAY_METHODS.map((m) => (
+                    {PAY_METHODS.filter((m) => enabledPay.includes(m.id)).map((m) => (
                       <button
                         key={m.id}
                         onClick={() => setPayMethod(m.id)}
