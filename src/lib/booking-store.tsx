@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { DEPOSIT_RATE } from "@/lib/data/barbers";
+import { DEPOSIT_RATE, getBarber } from "@/lib/data/barbers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
