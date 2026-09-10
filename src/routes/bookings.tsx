@@ -361,6 +361,26 @@ function BookingsPage() {
                     >
                       Cancelar cita
                     </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        downloadICS({
+                          title: `${service?.name ?? "Cita"} — ${barber.name}`,
+                          description: `Reserva GILT con ${barber.name}. Total $${b.total}.`,
+                          location: `${barber.shop}, ${barber.neighborhood}`,
+                          dateISO: b.dateISO,
+                          time: b.time,
+                          durationMin: service?.durationMin ?? 45,
+                        })
+                      }
+                      className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-gold hover:text-gold"
+                    >
+                      <CalendarDays size={13} /> Calendario
+                    </button>
+                    <ShareButton
+                      title={`Mi cita con ${barber.name} en GILT`}
+                      path={`/barber/${barber.slug}`}
+                    />
                   </div>
                 </div>
               </div>
