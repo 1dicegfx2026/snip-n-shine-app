@@ -99,6 +99,7 @@ export function LiveProvider({ children }: { children: ReactNode }) {
 
   const store: Store = {
     hydrated,
+    refresh,
     streams,
     live: streams.filter((s) => s.status === "live"),
     getStream: (id) => streams.find((s) => s.id === id),
