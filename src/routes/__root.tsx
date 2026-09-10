@@ -16,6 +16,7 @@ import { BookingProvider } from "../lib/booking-store";
 import { SiteProvider } from "../lib/site-store";
 import { ProProvider } from "../lib/pro-store";
 import { ClientProvider } from "../lib/client-store";
+import { ReviewProvider } from "../lib/review-store";
 import { AuthProvider } from "../lib/auth";
 
 import { Header } from "../components/Header";
