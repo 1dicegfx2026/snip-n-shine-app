@@ -5,7 +5,8 @@ import { useSite } from "@/lib/site-store";
 import { useBookings, type BookingStatus } from "@/lib/booking-store";
 import { usePros } from "@/lib/pro-store";
 import { useClients } from "@/lib/client-store";
-import { useAdmin } from "@/lib/admin";
+import { useAdmin, ROLE_ES, STAFF_ROLES, type StaffRole } from "@/lib/admin";
+import { usePlatformSettings } from "@/lib/platform-settings";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
