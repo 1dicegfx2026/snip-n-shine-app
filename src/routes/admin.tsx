@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Trash2, Eye, EyeOff, Film, Save, X } from "lucide-react";
+import { Plus, Trash2, Eye, EyeOff, Film, Save, X, UserRound, ArrowLeft, CalendarDays } from "lucide-react";
 import { useSite } from "@/lib/site-store";
 import { useBookings, type BookingStatus } from "@/lib/booking-store";
 import { usePros } from "@/lib/pro-store";
@@ -132,7 +132,7 @@ function AdminPage() {
       </nav>
 
       <div className="mt-6">
-        {tab === "citas" && <BookingsPanel />}
+        {tab === "citas" && <BookingsPanel admin={admin} />}
         {tab === "barberos" && <ProsPanel />}
         {tab === "clientes" && <ClientsPanel />}
         {tab === "usuarios" && <UsersPanel admin={admin} />}
@@ -164,13 +164,18 @@ function Overview() {
 
 /* ---------------- Citas ---------------- */
 
-function BookingsPanel() {
+function BookingsPanel({ admin }: { admin: ReturnType<typeof useAdmin> }) {
   const { bookings, adminPatch, deleteBooking, refundBooking } = useBookings();
   const [editing, setEditing] = useState<string | null>(null);
+  const [clientId, setClientId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | BookingStatus>("all");
   const list = [...bookings]
     .sort((a, b) => b.createdAt - a.createdAt)
     .filter((b) => filter === "all" || b.status === filter);
+
+  if (clientId) {
+    return <ClientAccountPanel clientId={clientId} admin={admin} onBack={() => setClientId(null)} />;
+  }
 
   return (
     <section className="rounded-xl border border-border bg-card p-5">
@@ -227,10 +232,19 @@ function BookingsPanel() {
               >
                 Editar
               </button>
+              {b.clientId && (
+                <button
+                  onClick={() => setClientId(b.clientId)}
+                  className="inline-flex items-center gap-1 rounded-lg border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-bold text-gold hover:bg-gold/20"
+                >
+                  <UserRound size={14} /> Abrir cliente
+                </button>
+              )}
               <button
                 onClick={() => {
-                  refundBooking(b.id);
-                  toast.success("Marcada como devuelta.");
+                  void refundBooking(b.id)
+                    .then(() => toast.success("Pago marcado como devuelto."))
+                    .catch((err: Error) => toast.error(err.message));
                 }}
                 className="rounded-lg border border-border px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-gold"
               >
@@ -252,6 +266,120 @@ function BookingsPanel() {
           ),
         )}
         {list.length === 0 && <p className="text-sm text-muted-foreground">No hay citas en este filtro.</p>}
+      </div>
+    </section>
+  );
+}
+
+function ClientAccountPanel({
+  clientId,
+  admin,
+  onBack,
+}: {
+  clientId: string;
+  admin: ReturnType<typeof useAdmin>;
+  onBack: () => void;
+}) {
+  const { bookings, adminPatch } = useBookings();
+  const account = admin.users.find((u) => u.id === clientId);
+  const clientBookings = [...bookings]
+    .filter((b) => b.clientId === clientId)
+    .sort((a, b) => b.createdAt - a.createdAt);
+  const paid = clientBookings.reduce((sum, b) => sum + b.amountPaid, 0);
+  const refunded = clientBookings.reduce((sum, b) => sum + b.refunded, 0);
+
+  const saveAccount = async (action: () => Promise<void>, success: string) => {
+    try {
+      await action();
+      toast.success(success);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo guardar el cambio.");
+    }
+  };
+
+  return (
+    <section className="rounded-xl border border-gold/30 bg-card p-5">
+      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-bold text-gold">
+        <ArrowLeft size={16} /> Volver a todas las citas
+      </button>
+      <div className="mt-5 flex flex-wrap items-start justify-between gap-4 border-b border-border pb-5">
+        <div>
+          <p className="text-xs font-bold tracking-widest text-gold">CUENTA DEL CLIENTE</p>
+          <h2 className="mt-1 font-display text-2xl font-bold">{account?.displayName ?? clientBookings[0]?.name ?? "Cliente"}</h2>
+          <p className="mt-1 break-all text-xs text-muted-foreground">ID: {clientId}</p>
+        </div>
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <Stat label="CITAS" value={String(clientBookings.length)} />
+          <Stat label="PAGADO" value={money(paid)} />
+          <Stat label="DEVUELTO" value={money(refunded)} />
+        </div>
+      </div>
+
+      {account ? (
+        <div className="mt-5 rounded-lg border border-border bg-background p-4">
+          <h3 className="font-display font-bold">Acceso y permisos</h3>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <select
+              value={account.plan}
+              disabled={!admin.isAdmin}
+              onChange={(e) => void saveAccount(() => admin.setPlan(account.id, e.target.value), "Plan actualizado.")}
+              className="rounded-lg border border-input bg-card px-3 py-2 text-xs disabled:opacity-50"
+            >
+              <option value="free">Free</option>
+              <option value="starter">Starter $19</option>
+              <option value="pro">Pro $49</option>
+              <option value="elite">Elite $99</option>
+            </select>
+            <button
+              disabled={!admin.isAdmin}
+              onClick={() => void saveAccount(() => admin.setFreeAccess(account.id, !account.freeAccess), account.freeAccess ? "Acceso gratis quitado." : "Acceso gratis activado.")}
+              className={`rounded-lg border px-3 py-2 text-xs font-bold disabled:opacity-50 ${account.freeAccess ? "border-gold text-gold" : "border-border text-muted-foreground"}`}
+            >
+              {account.freeAccess ? "Acceso gratis activo" : "Dar acceso gratis"}
+            </button>
+            {STAFF_ROLES.map((role) => {
+              const hasRole = account.roles.includes(role);
+              return (
+                <button
+                  key={role}
+                  disabled={!admin.isAdmin}
+                  onClick={() => void saveAccount(() => admin.setRole(account.id, role, !hasRole), hasRole ? `${ROLE_ES[role]} removido.` : `${ROLE_ES[role]} activado.`)}
+                  className={`rounded-lg border px-3 py-2 text-xs font-bold disabled:opacity-50 ${hasRole ? "border-gold text-gold" : "border-border text-muted-foreground"}`}
+                >
+                  {ROLE_ES[role]}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <p className="mt-5 rounded-lg border border-border bg-background p-4 text-sm text-muted-foreground">
+          La cita está conectada a una cuenta, pero tu permiso actual no permite administrar sus planes o roles.
+        </p>
+      )}
+
+      <div className="mt-6">
+        <h3 className="flex items-center gap-2 font-display text-lg font-bold"><CalendarDays size={18} className="text-gold" /> Historial de citas</h3>
+        <div className="mt-3 space-y-2">
+          {clientBookings.map((booking) => (
+            <div key={booking.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-background p-3">
+              <div className="min-w-[180px] flex-1">
+                <p className="font-semibold">{booking.dateISO} · {booking.time}</p>
+                <p className="text-xs text-muted-foreground">{booking.barberSlug} · {booking.payMethod ?? "sin método"} · {STATUS_ES[booking.status]}</p>
+              </div>
+              <p className="text-sm font-bold">{money(booking.amountPaid)} / {money(booking.total)}</p>
+              <select
+                value={booking.status}
+                disabled={!admin.canEdit}
+                onChange={(e) => void saveAccount(() => adminPatch(booking.id, { status: e.target.value as BookingStatus }), "Estado de la cita actualizado.")}
+                className="rounded-lg border border-input bg-card px-3 py-2 text-xs disabled:opacity-50"
+              >
+                {STATUSES.map((status) => <option key={status} value={status}>{STATUS_ES[status]}</option>)}
+              </select>
+            </div>
+          ))}
+          {clientBookings.length === 0 && <p className="text-sm text-muted-foreground">Esta cuenta no tiene citas.</p>}
+        </div>
       </div>
     </section>
   );

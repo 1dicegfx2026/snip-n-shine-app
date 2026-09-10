@@ -48,7 +48,7 @@ interface Store {
   markArrived: (id: string) => void;
   completeBooking: (id: string) => void;
   cancelBooking: (id: string) => Promise<void>;
-  refundBooking: (id: string) => void;
+  refundBooking: (id: string) => Promise<void>;
   /** Admin: cambia estado y montos a mano */
   adminPatch: (
     id: string,
@@ -268,10 +268,10 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         { status: "cancelled", amount_paid: 0, refunded },
       );
     },
-    refundBooking: (id) => {
+    refundBooking: async (id) => {
       const b = bookings.find((x) => x.id === id);
       const paid = b?.amountPaid ?? 0;
-      patch(
+      await patch(
         id,
         { status: "refunded", refunded: paid, amountPaid: 0 },
         { status: "refunded", refunded: paid, amount_paid: 0 },
