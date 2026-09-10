@@ -85,6 +85,10 @@ function BarberProfile() {
               </span>
             ))}
           </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <FavoriteButton slug={barber.slug} />
+            <ShareButton title={`${barber.name} en GILT`} path={`/barber/${barber.slug}`} />
+          </div>
         </div>
       </div>
 
