@@ -155,6 +155,28 @@ function BarberProfile() {
               </div>
             </div>
             <div className="mt-4 space-y-4">
+              {liveReviews.map((r) => (
+                <article key={r.id} className="rounded-xl border border-gold/40 bg-gold/5 p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-deep font-display text-sm font-bold text-primary">
+                        {(r.authorName || "G").charAt(0)}
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold">{r.authorName || "Cliente GILT"}</p>
+                        <p className="text-xs text-gold">
+                          Cliente verificado{r.serviceName ? ` · ${r.serviceName}` : ""} ·{" "}
+                          {new Date(r.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <Stars rating={r.rating} />
+                  </div>
+                  {r.comment && (
+                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{r.comment}</p>
+                  )}
+                </article>
+              ))}
               {barber.reviews.map((r) => (
                 <article key={r.id} className="rounded-xl border border-border bg-card p-5">
                   <div className="flex items-center justify-between">
