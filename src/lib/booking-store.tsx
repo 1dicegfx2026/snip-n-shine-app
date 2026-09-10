@@ -95,6 +95,27 @@ interface Row {
   created_at: string;
 }
 
+/** Avisa a la gente en lista de espera cuando se libera un cupo. */
+async function notifyWaitlist(barberSlug: string, dateISO: string, time: string) {
+  const { data } = await supabase
+    .from("waitlist")
+    .select("id, client_id")
+    .eq("barber_slug", barberSlug)
+    .eq("date_iso", dateISO)
+    .eq("time", time);
+  const rows = (data ?? []) as { id: string; client_id: string | null }[];
+  const barber = getBarber(barberSlug);
+  for (const row of rows) {
+    if (!row.client_id) continue;
+    await pushNotification({
+      userId: row.client_id,
+      title: "¡Se liberó tu cupo!",
+      body: `${barber?.name ?? barberSlug} tiene libre el ${dateISO} a las ${time}. Reserva antes de que lo tomen.`,
+      link: `/book/${barberSlug}`,
+    });
+  }
+}
+
 const n = (v: number | string) => (typeof v === "number" ? v : Number(v));
 
 function fromRow(r: Row): Booking {
