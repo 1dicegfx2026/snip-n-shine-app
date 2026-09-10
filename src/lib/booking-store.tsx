@@ -49,6 +49,13 @@ interface Store {
   completeBooking: (id: string) => void;
   cancelBooking: (id: string) => Promise<void>;
   refundBooking: (id: string) => void;
+  /** Admin: cambia estado y montos a mano */
+  adminPatch: (
+    id: string,
+    patch: Partial<Pick<Booking, "status" | "amountPaid" | "refunded" | "total" | "name" | "dateISO" | "time">>,
+  ) => Promise<void>;
+  /** Admin: borra la cita por completo */
+  deleteBooking: (id: string) => Promise<void>;
   joinWaitlist: (e: Omit<WaitlistEntry, "id">) => void;
   leaveWaitlist: (id: string) => void;
   bookedTimesFor: (barberSlug: string, dateISO: string) => string[];
@@ -269,6 +276,40 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         { status: "refunded", refunded: paid, amountPaid: 0 },
         { status: "refunded", refunded: paid, amount_paid: 0 },
       );
+    },
+    adminPatch: async (id, p) => {
+      const dbPatch: {
+        status?: string;
+        amount_paid?: number;
+        refunded?: number;
+        total?: number;
+        name?: string;
+        date_iso?: string;
+        time?: string;
+      } = {};
+      if (p.status !== undefined) dbPatch["status"] = p.status;
+      if (p.amountPaid !== undefined) dbPatch["amount_paid"] = p.amountPaid;
+      if (p.refunded !== undefined) dbPatch["refunded"] = p.refunded;
+      if (p.total !== undefined) dbPatch["total"] = p.total;
+      if (p.name !== undefined) dbPatch["name"] = p.name;
+      if (p.dateISO !== undefined) dbPatch["date_iso"] = p.dateISO;
+      if (p.time !== undefined) dbPatch["time"] = p.time;
+      const previous = bookings;
+      setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, ...p } : b)));
+      const { error } = await supabase.from("bookings").update(dbPatch).eq("id", id);
+      if (error) {
+        setBookings(previous);
+        throw new Error(error.message);
+      }
+    },
+    deleteBooking: async (id) => {
+      const previous = bookings;
+      setBookings((prev) => prev.filter((b) => b.id !== id));
+      const { error } = await supabase.from("bookings").delete().eq("id", id);
+      if (error) {
+        setBookings(previous);
+        throw new Error(error.message);
+      }
     },
     joinWaitlist: (e) => {
       const entry: WaitlistEntry = { ...e, id: crypto.randomUUID() };

@@ -53,9 +53,10 @@ export function ClientProvider({ children }: { children: ReactNode }) {
     getProfile: (handle) => profiles.find((p) => p.handle === handle),
     saveProfile: async (profile) => {
       if (!user) throw new Error("Tienes que iniciar sesión");
+      const existing = rows.find((r) => r.handle === profile.handle);
       const { error } = await supabase.from("client_profiles").upsert({
         handle: profile.handle,
-        owner_id: user.id,
+        owner_id: existing?.owner_id ?? user.id,
         data: profile as never,
         updated_at: new Date().toISOString(),
       });

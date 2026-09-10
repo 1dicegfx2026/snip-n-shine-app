@@ -54,9 +54,13 @@ export function ProProvider({ children }: { children: ReactNode }) {
     getPage: (handle) => pages.find((p) => p.handle === handle),
     savePage: async (page) => {
       if (!user) throw new Error("Tienes que iniciar sesión");
-      const { error } = await supabase
-        .from("pro_pages")
-        .upsert({ handle: page.handle, owner_id: user.id, data: page as never, updated_at: new Date().toISOString() });
+      const existing = rows.find((r) => r.handle === page.handle);
+      const { error } = await supabase.from("pro_pages").upsert({
+        handle: page.handle,
+        owner_id: existing?.owner_id ?? user.id,
+        data: page as never,
+        updated_at: new Date().toISOString(),
+      });
       if (error) throw error;
       await load();
     },
