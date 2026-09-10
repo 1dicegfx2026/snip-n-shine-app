@@ -38,8 +38,8 @@ function AuthPage() {
   }, [user, loading, navigate]);
 
   const submit = async () => {
-    if (!email.trim() || password.length < 6) {
-      toast.error("Pon tu correo y una clave de 6 caracteres o más.");
+    if (!email.trim() || password.length < 8) {
+      toast.error("Pon tu correo y una clave de 8 caracteres o más, con números y símbolos.");
       return;
     }
     setBusy(true);
@@ -65,7 +65,16 @@ function AuthPage() {
       }
       navigate({ to: "/" });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "No pudimos entrar.");
+      const raw = e instanceof Error ? e.message : "";
+      const low = raw.toLowerCase();
+      const msg = low.includes("weak") || low.includes("password")
+        ? "Esa clave es muy fácil. Usa 8+ caracteres con números y un símbolo (ej. Corte2026!)."
+        : low.includes("already registered") || low.includes("already been")
+          ? "Ese correo ya tiene cuenta. Entra con tu clave."
+          : low.includes("invalid login")
+            ? "Correo o clave incorrectos."
+            : raw || "No pudimos entrar.";
+      toast.error(msg);
     } finally {
       setBusy(false);
     }

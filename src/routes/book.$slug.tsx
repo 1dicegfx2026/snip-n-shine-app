@@ -52,7 +52,13 @@ function BookingFlow() {
   const total = service?.price ?? 0;
   const dueToday = payType === "deposit" ? Math.round(total * depositRate) : total;
 
-  const canConfirm = Boolean(service && dateISO && time && name.trim());
+  const missing = [
+    !service && "escoger el servicio",
+    !dateISO && "escoger el día",
+    !time && "escoger la hora",
+    !name.trim() && "escribir tu nombre",
+  ].filter(Boolean) as string[];
+  const canConfirm = missing.length === 0;
 
   if (confirmed && service) {
     return (
@@ -336,6 +342,11 @@ function BookingFlow() {
             >
               Confirm booking <ArrowRight size={16} />
             </button>
+            {!canConfirm && (
+              <p className="mt-3 rounded-lg border border-dashed border-gold/40 bg-gold/5 px-3 py-2 text-center text-[11px] font-semibold text-gold">
+                Para confirmar te falta: {missing.join(", ")}.
+              </p>
+            )}
             <p className="mt-3 text-center text-[11px] text-muted-foreground">
               Free cancellation up to 4h before. Reminders by email & SMS.
             </p>
