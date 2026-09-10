@@ -35,6 +35,7 @@ const TABS = [
   { id: "citas", label: "Citas", adminOnly: false },
   { id: "barberos", label: "Barberos", adminOnly: false },
   { id: "clientes", label: "Clientes", adminOnly: false },
+  { id: "resenas", label: "Reseñas", adminOnly: false },
   { id: "usuarios", label: "Usuarios", adminOnly: true },
   { id: "sponsors", label: "Sponsors", adminOnly: false },
   { id: "anuncios", label: "Anuncios", adminOnly: false },
