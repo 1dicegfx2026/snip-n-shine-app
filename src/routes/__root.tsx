@@ -144,6 +144,7 @@ function RootComponent() {
         <ProProvider>
           <ClientProvider>
             <BookingProvider>
+              <ReviewProvider>
               <div className="flex min-h-screen flex-col">
                 <Header />
                 <main className="flex-1">
@@ -152,6 +153,7 @@ function RootComponent() {
                 <Footer />
               </div>
               <Toaster theme="dark" position="bottom-right" richColors />
+              </ReviewProvider>
             </BookingProvider>
           </ClientProvider>
         </ProProvider>
