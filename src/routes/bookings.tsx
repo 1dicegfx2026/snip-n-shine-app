@@ -255,6 +255,34 @@ function BookingsPage() {
       <p className="text-xs font-bold tracking-[0.25em] text-gold">MY CHAIRS</p>
       <h1 className="mt-2 font-display text-4xl font-extrabold">My bookings</h1>
 
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground">Cortes completados</p>
+          <p className="mt-1 font-display text-2xl font-bold">{past.length}</p>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-4">
+          <p className="text-xs text-muted-foreground">Total pagado</p>
+          <p className="mt-1 font-display text-2xl font-bold">${spent.toFixed(2)}</p>
+        </div>
+        <div className="rounded-xl border border-gold/40 bg-gold/5 p-4">
+          <p className="flex items-center gap-1.5 text-xs font-semibold text-gold">
+            <Trophy size={13} /> Club GILT
+          </p>
+          <div className="mt-2 flex gap-1.5">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <span
+                key={i}
+                className={`h-2 flex-1 rounded-full ${i < loyaltyDone ? "bg-gold" : "bg-border"}`}
+              />
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {5 - loyaltyDone} corte{5 - loyaltyDone === 1 ? "" : "s"} para tu recompensa
+          </p>
+        </div>
+      </div>
+
+
       {upcoming.length === 0 && waitlist.length === 0 ? (
         <div className="mt-10 rounded-xl border border-border bg-card p-14 text-center">
           <CalendarX size={36} className="mx-auto text-muted-foreground" />
