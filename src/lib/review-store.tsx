@@ -11,6 +11,8 @@ export interface LiveReview {
   serviceName: string;
   rating: number;
   comment: string;
+  reply: string;
+  replyAt: number | null;
   createdAt: number;
 }
 
@@ -26,6 +28,8 @@ interface Store {
     comment: string;
   }) => Promise<void>;
   deleteReview: (id: string) => Promise<void>;
+  /** El barbero (o staff) responde públicamente a la reseña */
+  replyToReview: (id: string, reply: string) => Promise<void>;
   reviewFor: (bookingId: string) => LiveReview | undefined;
   reviewsFor: (barberSlug: string) => LiveReview[];
   isFavorite: (barberSlug: string) => boolean;
@@ -43,6 +47,8 @@ interface Row {
   service_name: string;
   rating: number;
   comment: string;
+  reply: string | null;
+  reply_at: string | null;
   created_at: string;
 }
 
@@ -67,6 +73,8 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
           serviceName: r.service_name,
           rating: r.rating,
           comment: r.comment,
+          reply: r.reply ?? "",
+          replyAt: r.reply_at ? new Date(r.reply_at).getTime() : null,
           createdAt: new Date(r.created_at).getTime(),
         })),
       );
@@ -105,6 +113,17 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
       });
       if (error) throw new Error(error.message);
       await load();
+    },
+    replyToReview: async (id, reply) => {
+      const replyAt = new Date().toISOString();
+      const { error } = await supabase
+        .from("reviews")
+        .update({ reply, reply_at: replyAt })
+        .eq("id", id);
+      if (error) throw new Error(error.message);
+      setReviews((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, reply, replyAt: new Date(replyAt).getTime() } : r)),
+      );
     },
     deleteReview: async (id) => {
       const { error } = await supabase.from("reviews").delete().eq("id", id);
