@@ -4,16 +4,21 @@ import { SPONSORS, type Sponsor } from "@/lib/data/sponsors";
 import heroImg from "@/assets/hero.jpg";
 import promoShot from "@/assets/promo/promo-2.jpg";
 
-export type PayMethod = "card" | "zelle" | "cashapp" | "applepay" | "paypal" | "venmo";
+export type PayMethod = "card" | "cash" | "zelle" | "cashapp" | "applepay" | "paypal" | "venmo";
+
+/** Methods where nothing is charged online — the barber confirms the payment in person. */
+export const OFFLINE_PAY_METHODS: PayMethod[] = ["cash", "zelle", "cashapp"];
 
 export const PAY_METHODS: { id: PayMethod; label: string; hint: string }[] = [
   { id: "card", label: "Tarjeta", hint: "Visa, Mastercard, Amex — cobro seguro." },
-  { id: "zelle", label: "Zelle", hint: "Envía a pagos@giltbooking.com y pon tu nombre en la nota." },
-  { id: "cashapp", label: "Cash App", hint: "$GILTBOOKING — incluye el código de tu cita." },
+  { id: "cash", label: "Efectivo", hint: "Pagas en efectivo en la barbería. El barbero confirma el pago cuando llegues." },
+  { id: "zelle", label: "Zelle", hint: "Envía a pagos@giltbooking.com con tu nombre en la nota. El barbero confirma el pago al recibirlo." },
+  { id: "cashapp", label: "Cash App", hint: "$GILTBOOKING — incluye el código de tu cita. El barbero confirma el pago al recibirlo." },
   { id: "applepay", label: "Apple Pay", hint: "Confirma con Face ID en el checkout." },
   { id: "paypal", label: "PayPal", hint: "pagos@giltbooking.com — enviar como bienes y servicios." },
   { id: "venmo", label: "Venmo", hint: "@GILT-Booking — nota privada con tu nombre." },
 ];
+
 
 export interface HeroSlide {
   id: string;

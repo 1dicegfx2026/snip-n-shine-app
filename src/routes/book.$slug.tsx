@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, Check, CreditCard, ShieldCheck, PartyPopper } fr
 import { getBarber, getSlots, nextNDates, formatDateLong } from "@/lib/data/barbers";
 import { BASE_COMMISSION } from "@/lib/data/pro-pages";
 import { useBookings } from "@/lib/booking-store";
-import { PAY_METHODS, type PayMethod } from "@/lib/site-store";
+import { PAY_METHODS, OFFLINE_PAY_METHODS, type PayMethod } from "@/lib/site-store";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/book/$slug")({
@@ -50,7 +50,8 @@ function BookingFlow() {
   const slots = dateISO ? getSlots(barber, dateISO, bookedTimesFor(barber.slug, dateISO)) : [];
 
   const total = service?.price ?? 0;
-  const dueToday = payType === "deposit" ? Math.round(total * depositRate) : total;
+  const offline = OFFLINE_PAY_METHODS.includes(payMethod);
+  const dueToday = offline ? 0 : payType === "deposit" ? Math.round(total * depositRate) : total;
 
   const missing = [
     !service && "escoger el servicio",
@@ -73,17 +74,26 @@ function BookingFlow() {
         </p>
         <div className="mt-6 rounded-xl border border-gold/30 bg-card p-5 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Paid today ({payType === "deposit" ? `${Math.round(depositRate * 100)}% deposit` : "full"})</span>
-            <span className="font-bold text-gold">${dueToday}</span>
+            <span className="text-muted-foreground">
+              {offline
+                ? `Pagas al llegar (${PAY_METHODS.find((m) => m.id === payMethod)?.label})`
+                : `Paid today (${payType === "deposit" ? `${Math.round(depositRate * 100)}% deposit` : "full"})`}
+            </span>
+            <span className="font-bold text-gold">${offline ? total : dueToday}</span>
           </div>
-          <div className="mt-2 flex justify-between">
-            <span className="text-muted-foreground">Due at the chair</span>
-            <span className="font-semibold">${total - dueToday}</span>
-          </div>
+          {!offline && (
+            <div className="mt-2 flex justify-between">
+              <span className="text-muted-foreground">Due at the chair</span>
+              <span className="font-semibold">${total - dueToday}</span>
+            </div>
+          )}
         </div>
         <p className="mt-4 text-xs text-muted-foreground">
-          Reminders set: 24h before (email) and 2h before (SMS). Demo mode — no card was charged.
+          {offline
+            ? "Sin tarjeta: el barbero confirma tu pago en la barbería. Recordatorios 24h antes (email) y 2h antes (SMS)."
+            : "Reminders set: 24h before (email) and 2h before (SMS). Demo mode — no card was charged."}
         </p>
+
         <div className="mt-8 flex justify-center gap-3">
           <Link
             to="/bookings"
@@ -221,6 +231,14 @@ function BookingFlow() {
                   />
                 </div>
 
+                {offline ? (
+                  <div className="rounded-xl border border-gold/40 bg-gold/5 p-4">
+                    <p className="text-sm font-bold text-gold">Pagas ${total} sin tarjeta</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Hoy no se cobra nada. El barbero confirma tu pago cuando llegues a la cita.
+                    </p>
+                  </div>
+                ) : (
                 <div className="grid gap-2 sm:grid-cols-2">
                   <button
                     onClick={() => setPayType("deposit")}
@@ -243,6 +261,8 @@ function BookingFlow() {
                     <p className="mt-0.5 text-xs text-muted-foreground">Skip the counter entirely.</p>
                   </button>
                 </div>
+                )}
+
 
                 <div className="rounded-lg border border-dashed border-border bg-background p-4">
                   <p className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
@@ -313,8 +333,8 @@ function BookingFlow() {
               <div className="my-3 hairline-gold" />
               <Row label="Total" value={`$${total}`} />
               <div className="flex justify-between text-base">
-                <span className="font-semibold">Due today</span>
-                <span className="font-display font-extrabold text-gold">${dueToday}</span>
+                <span className="font-semibold">{offline ? "Pagas en la cita" : "Due today"}</span>
+                <span className="font-display font-extrabold text-gold">${offline ? total : dueToday}</span>
               </div>
             </div>
             <button
