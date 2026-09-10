@@ -103,12 +103,8 @@ export function useAdmin(): AdminStore {
     roles,
     users,
     refresh,
-    claimAdmin: async () => {
-      const { data, error } = await supabase.rpc("claim_admin");
-      if (error || !data) return false;
-      await refresh();
-      return true;
-    },
+    // El admin principal ya está asignado; los demás se nombran desde el panel.
+    claimAdmin: async () => false,
     setFreeAccess: async (id, value) => {
       const { error } = await supabase.from("profiles").update({ free_access: value }).eq("id", id);
       if (error) throw new Error(error.message);
