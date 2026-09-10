@@ -268,15 +268,26 @@ function DashboardPage() {
                       </p>
                     </div>
                     {b.status === "upcoming" ? (
-                      <button
-                        onClick={() => {
-                          markArrived(b.id);
-                          toast.success(`Cliente llegó — cobrados ${money(pending)} restantes.`);
-                        }}
-                        className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/85"
-                      >
-                        <UserCheck size={14} /> Cliente llegó · cobrar {money(pending)}
-                      </button>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => {
+                            markArrived(b.id);
+                            toast.success(`Cliente llegó — cobrados ${money(pending)} restantes.`);
+                          }}
+                          className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/85"
+                        >
+                          <UserCheck size={14} /> Cliente llegó · cobrar {money(pending)}
+                        </button>
+                        <button
+                          onClick={() => {
+                            markNoShow(b.id);
+                            toast.info("Marcado como no apareció. El depósito se queda contigo.");
+                          }}
+                          className="rounded-lg border border-destructive/40 px-3 py-2 text-xs font-bold text-destructive hover:bg-destructive/10"
+                        >
+                          No apareció
+                        </button>
+                      </div>
                     ) : b.status === "arrived" ? (
                       <button
                         onClick={() => {
