@@ -49,6 +49,13 @@ interface Store {
   completeBooking: (id: string) => void;
   cancelBooking: (id: string) => Promise<void>;
   refundBooking: (id: string) => void;
+  /** Admin: cambia estado y montos a mano */
+  adminPatch: (
+    id: string,
+    patch: Partial<Pick<Booking, "status" | "amountPaid" | "refunded" | "total" | "name" | "dateISO" | "time">>,
+  ) => Promise<void>;
+  /** Admin: borra la cita por completo */
+  deleteBooking: (id: string) => Promise<void>;
   joinWaitlist: (e: Omit<WaitlistEntry, "id">) => void;
   leaveWaitlist: (id: string) => void;
   bookedTimesFor: (barberSlug: string, dateISO: string) => string[];
