@@ -298,6 +298,7 @@ function ClientAccountPanel({
     .sort((a, b) => b.createdAt - a.createdAt);
   const paid = clientBookings.reduce((sum, b) => sum + b.amountPaid, 0);
   const refunded = clientBookings.reduce((sum, b) => sum + b.refunded, 0);
+  const noShows = clientBookings.filter((b) => b.status === "no_show").length;
 
   const saveAccount = async (action: () => Promise<void>, success: string) => {
     try {
@@ -319,10 +320,11 @@ function ClientAccountPanel({
           <h2 className="mt-1 font-display text-2xl font-bold">{account?.displayName ?? clientBookings[0]?.name ?? "Cliente"}</h2>
           <p className="mt-1 break-all text-xs text-muted-foreground">ID: {clientId}</p>
         </div>
-        <div className="grid grid-cols-3 gap-2 text-center">
+        <div className="grid grid-cols-4 gap-2 text-center">
           <Stat label="CITAS" value={String(clientBookings.length)} />
           <Stat label="PAGADO" value={money(paid)} />
           <Stat label="DEVUELTO" value={money(refunded)} />
+          <Stat label="NO APARECIÓ" value={String(noShows)} />
         </div>
       </div>
 
