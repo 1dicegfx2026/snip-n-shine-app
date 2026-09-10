@@ -58,6 +58,7 @@ function DashboardPage() {
     bookings,
     waitlist,
     markArrived,
+    markNoShow,
     completeBooking,
     cancelBooking,
     refundBooking,
