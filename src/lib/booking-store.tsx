@@ -47,7 +47,7 @@ interface Store {
   /** El barbero marca que el cliente llegó: se cobra el resto antes de recortar */
   markArrived: (id: string) => void;
   completeBooking: (id: string) => void;
-  cancelBooking: (id: string) => void;
+  cancelBooking: (id: string) => Promise<void>;
   refundBooking: (id: string) => void;
   joinWaitlist: (e: Omit<WaitlistEntry, "id">) => void;
   leaveWaitlist: (id: string) => void;
@@ -163,13 +163,18 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const patch = (
+  const patch = async (
     id: string,
     p: Partial<Booking>,
     dbPatch: { status?: string; amount_paid?: number; refunded?: number },
   ) => {
+    const previous = bookings;
     setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, ...p } : b)));
-    void supabase.from("bookings").update(dbPatch).eq("id", id);
+    const { error } = await supabase.from("bookings").update(dbPatch).eq("id", id);
+    if (error) {
+      setBookings(previous);
+      throw new Error(error.message);
+    }
   };
 
   const store: Store = {
@@ -239,7 +244,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         }),
       );
       const { error } = await supabase.from("bookings").update(dbPatch).eq("id", id);
-      if (error) console.error("booking update failed", error.message);
+      if (error) throw new Error(error.message);
     },
     markArrived: (id) => {
       const b = bookings.find((x) => x.id === id);
@@ -247,7 +252,15 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       patch(id, { status: "arrived", amountPaid: total }, { status: "arrived", amount_paid: total });
     },
     completeBooking: (id) => patch(id, { status: "completed" }, { status: "completed" }),
-    cancelBooking: (id) => patch(id, { status: "cancelled" }, { status: "cancelled" }),
+    cancelBooking: async (id) => {
+      const b = bookings.find((x) => x.id === id);
+      const refunded = b?.amountPaid ?? 0;
+      await patch(
+        id,
+        { status: "cancelled", amountPaid: 0, refunded },
+        { status: "cancelled", amount_paid: 0, refunded },
+      );
+    },
     refundBooking: (id) => {
       const b = bookings.find((x) => x.id === id);
       const paid = b?.amountPaid ?? 0;

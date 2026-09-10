@@ -1,6 +1,6 @@
 import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarX, BellRing, Hourglass, CalendarPlus, ArrowRight, Pencil, X, Check } from "lucide-react";
+import { CalendarX, BellRing, Hourglass, CalendarPlus, ArrowRight, Pencil, X, Check, Eye, MapPin, CreditCard, AlertTriangle } from "lucide-react";
 import { getBarber, formatDateLong, getSlots, nextNDates } from "@/lib/data/barbers";
 import { useBookings } from "@/lib/booking-store";
 import { toast } from "sonner";
@@ -51,10 +51,15 @@ function BookingEditCard({
       return;
     }
     setSaving(true);
-    await updateBooking(booking.id, { serviceId, dateISO, time });
-    setSaving(false);
-    toast.success("Cita actualizada.");
-    onDone();
+    try {
+      await updateBooking(booking.id, { serviceId, dateISO, time });
+      toast.success("Cita actualizada y guardada.");
+      onDone();
+    } catch {
+      toast.error("No se pudo guardar el cambio. Inténtalo otra vez.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -163,9 +168,30 @@ function BookingsPage() {
   const { bookings, waitlist, cancelBooking, leaveWaitlist } = useBookings();
   const { user } = useAuth();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [detailsId, setDetailsId] = useState<string | null>(null);
+  const [cancelId, setCancelId] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState(false);
   const mine = bookings.filter((b) => b.clientId === user?.id);
   const upcoming = mine.filter((b) => b.status === "upcoming");
   const cancelled = mine.filter((b) => b.status === "cancelled");
+  const detailsBooking = mine.find((b) => b.id === detailsId);
+  const detailsBarber = detailsBooking ? getBarber(detailsBooking.barberSlug) : undefined;
+  const detailsService = detailsBarber?.services.find((s) => s.id === detailsBooking?.serviceId);
+
+  const confirmCancellation = async () => {
+    if (!cancelId) return;
+    setCancelling(true);
+    try {
+      await cancelBooking(cancelId);
+      toast.success("Cita cancelada. El horario ya está disponible.");
+      setCancelId(null);
+      setDetailsId(null);
+    } catch {
+      toast.error("No se pudo cancelar la cita. Inténtalo otra vez.");
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
@@ -221,28 +247,34 @@ function BookingsPage() {
                     <BellRing size={12} className="text-primary" /> Reminders: 24h email · 2h SMS
                   </p>
                 </div>
-                <div className="flex items-center gap-3 sm:flex-col sm:items-end">
+                <div className="flex flex-wrap items-center gap-3 sm:flex-col sm:items-end">
                   <div className="text-right text-sm">
                     <p className="font-bold">${b.total}</p>
                     <p className="text-xs text-muted-foreground">
                       ${b.amountPaid} paid ({b.payType === "deposit" ? "deposit" : "full"})
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button
-                      onClick={() => setEditingId(b.id)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-gold hover:text-gold"
+                      type="button"
+                      onClick={() => setDetailsId(b.id)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-gold/40 bg-gold/10 px-3 py-2 text-xs font-bold text-gold transition-colors hover:bg-gold/20"
                     >
-                      <Pencil size={13} /> Edit
+                      <Eye size={13} /> Ver detalles
                     </button>
                     <button
-                      onClick={() => {
-                        cancelBooking(b.id);
-                        toast.info("Booking cancelled — the slot is now open to others.");
-                      }}
-                      className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+                      type="button"
+                      onClick={() => setEditingId(b.id)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-gold hover:text-gold"
                     >
-                      Cancel
+                      <Pencil size={13} /> Editar cita
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCancelId(b.id)}
+                      className="rounded-lg border border-destructive/40 px-3 py-2 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/10"
+                    >
+                      Cancelar cita
                     </button>
                   </div>
                 </div>
@@ -310,6 +342,45 @@ function BookingsPage() {
               })}
             </>
           )}
+        </div>
+      )}
+
+      {detailsBooking && detailsBarber && (
+        <div className="fixed inset-0 z-[70] flex items-end justify-center bg-background/80 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="booking-details-title">
+          <div className="w-full max-w-lg rounded-t-xl border border-border bg-card p-6 shadow-2xl sm:rounded-xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold">Cita confirmada</p>
+                <h2 id="booking-details-title" className="mt-1 font-display text-2xl font-bold">{detailsService?.name ?? "Cita"}</h2>
+              </div>
+              <button type="button" onClick={() => setDetailsId(null)} aria-label="Cerrar detalles" className="rounded-lg border border-border p-2 text-muted-foreground hover:text-foreground"><X size={18} /></button>
+            </div>
+            <div className="mt-6 space-y-4 text-sm">
+              <div className="flex gap-3"><img src={detailsBarber.avatar} alt={detailsBarber.name} className="h-12 w-12 rounded-lg object-cover" /><div><p className="font-bold">{detailsBarber.name}</p><p className="text-muted-foreground">{detailsBarber.shop}</p></div></div>
+              <div className="flex gap-3 border-t border-border pt-4"><CalendarPlus size={18} className="text-gold" /><div><p className="font-semibold">{formatDateLong(detailsBooking.dateISO)} · {slotLabel(detailsBooking.time)}</p><p className="text-muted-foreground">Fecha y hora reservadas</p></div></div>
+              <div className="flex gap-3"><MapPin size={18} className="text-gold" /><div><p className="font-semibold">{detailsBarber.shop}</p><p className="text-muted-foreground">{detailsBarber.neighborhood}</p></div></div>
+              <div className="flex gap-3"><CreditCard size={18} className="text-gold" /><div><p className="font-semibold">${detailsBooking.total} total · ${detailsBooking.amountPaid} pagado</p><p className="capitalize text-muted-foreground">Método: {detailsBooking.payMethod ?? "No indicado"}</p></div></div>
+              <div className="rounded-lg border border-border bg-background p-3"><p className="text-xs text-muted-foreground">Número de confirmación</p><p className="mt-1 break-all font-mono text-xs font-semibold">{detailsBooking.id}</p></div>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <button type="button" onClick={() => { setDetailsId(null); setEditingId(detailsBooking.id); }} className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"><Pencil size={14} /> Editar cita</button>
+              <button type="button" onClick={() => setCancelId(detailsBooking.id)} className="rounded-lg border border-destructive/40 px-4 py-2 text-sm font-bold text-destructive">Cancelar cita</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cancelId && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm" role="alertdialog" aria-modal="true" aria-labelledby="cancel-booking-title">
+          <div className="w-full max-w-md rounded-xl border border-destructive/40 bg-card p-6 shadow-2xl">
+            <AlertTriangle size={28} className="text-destructive" />
+            <h2 id="cancel-booking-title" className="mt-4 font-display text-xl font-bold">¿Cancelar esta cita?</h2>
+            <p className="mt-2 text-sm text-muted-foreground">La cita pasará a cancelada y este horario quedará libre. Si aparece un pago registrado, quedará marcado para reembolso.</p>
+            <div className="mt-6 flex gap-2">
+              <button type="button" disabled={cancelling} onClick={() => void confirmCancellation()} className="rounded-lg bg-destructive px-4 py-2 text-sm font-bold text-destructive-foreground disabled:opacity-50">{cancelling ? "Cancelando…" : "Sí, cancelar cita"}</button>
+              <button type="button" disabled={cancelling} onClick={() => setCancelId(null)} className="rounded-lg border border-border px-4 py-2 text-sm font-semibold">No, volver</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
