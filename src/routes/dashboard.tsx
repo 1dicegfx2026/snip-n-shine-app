@@ -189,12 +189,12 @@ function DashboardPage() {
             Comisión por corte con este plan: <b className="text-gold">{Math.round(plan.commission * 100)}%</b>.
           </p>
           {plan.id === "elite" ? (
-            <button
-              onClick={() => toast.success("Transmisión iniciada (demo) — tus clientes reciben aviso.")}
+            <Link
+              to="/live/new"
               className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-display text-sm font-bold text-primary-foreground hover:bg-primary/85"
             >
               <Radio size={16} /> Salir en vivo ahora
-            </button>
+            </Link>
           ) : (
             <p className="mt-4 rounded-lg border border-dashed border-gold/40 p-3 text-xs text-muted-foreground">
               El live directo desde la app es exclusivo del plan <b className="text-gold">Elite ($99)</b>.{" "}

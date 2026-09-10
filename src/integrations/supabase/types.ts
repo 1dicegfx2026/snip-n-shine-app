@@ -119,6 +119,92 @@ export type Database = {
         }
         Relationships: []
       }
+      live_messages: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          stream_id: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string
+          body: string
+          created_at?: string
+          id?: string
+          stream_id: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          id?: string
+          stream_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_messages_stream_id_fkey"
+            columns: ["stream_id"]
+            isOneToOne: false
+            referencedRelation: "live_streams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_streams: {
+        Row: {
+          barber_slug: string
+          created_at: string
+          description: string
+          ended_at: string | null
+          external_url: string
+          host_id: string
+          host_name: string
+          id: string
+          mode: string
+          started_at: string
+          status: string
+          title: string
+          updated_at: string
+          viewers: number
+        }
+        Insert: {
+          barber_slug?: string
+          created_at?: string
+          description?: string
+          ended_at?: string | null
+          external_url?: string
+          host_id: string
+          host_name?: string
+          id?: string
+          mode?: string
+          started_at?: string
+          status?: string
+          title: string
+          updated_at?: string
+          viewers?: number
+        }
+        Update: {
+          barber_slug?: string
+          created_at?: string
+          description?: string
+          ended_at?: string | null
+          external_url?: string
+          host_id?: string
+          host_name?: string
+          id?: string
+          mode?: string
+          started_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          viewers?: number
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string
