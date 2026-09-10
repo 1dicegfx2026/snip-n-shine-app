@@ -228,7 +228,9 @@ function BookingsPage() {
   const mine = bookings.filter((b) => b.clientId === user?.id);
   const upcoming = mine.filter((b) => b.status === "upcoming" || b.status === "arrived");
   const past = mine.filter((b) => b.status === "completed");
-  const cancelled = mine.filter((b) => b.status === "cancelled" || b.status === "refunded");
+  const cancelled = mine.filter(
+    (b) => b.status === "cancelled" || b.status === "refunded" || b.status === "no_show",
+  );
   const loyaltyDone = past.length % 5;
   const spent = mine.reduce((sum, b) => sum + b.amountPaid, 0);
   const detailsBooking = mine.find((b) => b.id === detailsId);
