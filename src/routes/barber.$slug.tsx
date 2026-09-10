@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useReviews } from "@/lib/review-store";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShareButton } from "@/components/ShareButton";
+import { ReviewReply } from "@/components/ReviewReply";
 
 export const Route = createFileRoute("/barber/$slug")({
   loader: ({ params }) => {
