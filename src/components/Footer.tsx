@@ -28,6 +28,7 @@ export function Footer() {
                 <li><Link to="/community" className="hover:text-gold">Comunidad</Link></li>
                 <li><Link to="/u/new" search={{ edit: "" }} className="hover:text-gold">Crear mi perfil</Link></li>
                 <li><Link to="/classes" className="hover:text-gold">Clases en vivo</Link></li>
+                <li><Link to="/live" className="hover:text-gold">En vivo ahora</Link></li>
               </ul>
             </div>
             <div>
