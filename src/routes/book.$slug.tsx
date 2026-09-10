@@ -333,8 +333,8 @@ function BookingFlow() {
               <div className="my-3 hairline-gold" />
               <Row label="Total" value={`$${total}`} />
               <div className="flex justify-between text-base">
-                <span className="font-semibold">Due today</span>
-                <span className="font-display font-extrabold text-gold">${dueToday}</span>
+                <span className="font-semibold">{offline ? "Pagas en la cita" : "Due today"}</span>
+                <span className="font-display font-extrabold text-gold">${offline ? total : dueToday}</span>
               </div>
             </div>
             <button
