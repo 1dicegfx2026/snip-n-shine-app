@@ -2,8 +2,15 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { DEPOSIT_RATE, getBarber } from "@/lib/data/barbers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { pushNotification } from "@/lib/notification-store";
 
-export type BookingStatus = "upcoming" | "arrived" | "completed" | "cancelled" | "refunded";
+export type BookingStatus =
+  | "upcoming"
+  | "arrived"
+  | "completed"
+  | "cancelled"
+  | "refunded"
+  | "no_show";
 
 export interface Booking {
   id: string;
@@ -47,6 +54,8 @@ interface Store {
   /** El barbero marca que el cliente llegó: se cobra el resto antes de recortar */
   markArrived: (id: string) => void;
   completeBooking: (id: string) => void;
+  /** El cliente no apareció a su cita */
+  markNoShow: (id: string) => void;
   cancelBooking: (id: string) => Promise<void>;
   refundBooking: (id: string) => Promise<void>;
   /** Admin: cambia estado y montos a mano */
@@ -259,6 +268,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       patch(id, { status: "arrived", amountPaid: total }, { status: "arrived", amount_paid: total });
     },
     completeBooking: (id) => patch(id, { status: "completed" }, { status: "completed" }),
+    markNoShow: (id) => patch(id, { status: "no_show" }, { status: "no_show" }),
     cancelBooking: async (id) => {
       const b = bookings.find((x) => x.id === id);
       const refunded = b?.amountPaid ?? 0;
@@ -267,6 +277,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         { status: "cancelled", amountPaid: 0, refunded },
         { status: "cancelled", amount_paid: 0, refunded },
       );
+      if (b) void notifyWaitlist(b.barberSlug, b.dateISO, b.time);
     },
     refundBooking: async (id) => {
       const b = bookings.find((x) => x.id === id);
