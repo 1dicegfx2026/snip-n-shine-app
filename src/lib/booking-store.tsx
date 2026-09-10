@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { DEPOSIT_RATE } from "@/lib/data/barbers";
+import { DEPOSIT_RATE, getBarber } from "@/lib/data/barbers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
@@ -40,6 +40,10 @@ interface Store {
   addBooking: (
     b: Omit<Booking, "id" | "createdAt" | "status" | "refunded" | "clientId">,
   ) => Booking;
+  updateBooking: (
+    id: string,
+    patch: Partial<Pick<Booking, "serviceId" | "dateISO" | "time" | "name" | "payType" | "payMethod">>,
+  ) => Promise<void>;
   /** El barbero marca que el cliente llegó: se cobra el resto antes de recortar */
   markArrived: (id: string) => void;
   completeBooking: (id: string) => void;
@@ -203,6 +207,39 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         if (error) console.error("booking insert failed", error.message, error.details);
       })();
       return booking;
+    },
+    updateBooking: async (id, patch) => {
+      const dbPatch: {
+        service_id?: string;
+        date_iso?: string;
+        time?: string;
+        name?: string;
+        pay_type?: string;
+        pay_method?: string | null;
+        total?: number;
+      } = {};
+      if (patch.serviceId !== undefined) dbPatch["service_id"] = patch.serviceId;
+      if (patch.dateISO !== undefined) dbPatch["date_iso"] = patch.dateISO;
+      if (patch.time !== undefined) dbPatch["time"] = patch.time;
+      if (patch.name !== undefined) dbPatch["name"] = patch.name;
+      if (patch.payType !== undefined) dbPatch["pay_type"] = patch.payType;
+      if (patch.payMethod !== undefined) dbPatch["pay_method"] = patch.payMethod ?? null;
+
+      setBookings((prev) =>
+        prev.map((b) => {
+          if (b.id !== id) return b;
+          const next: Booking = { ...b, ...patch };
+          const barber = getBarber(next.barberSlug);
+          const service = barber?.services.find((s) => s.id === next.serviceId);
+          if (service) {
+            next.total = service.price;
+            dbPatch["total"] = service.price;
+          }
+          return next;
+        }),
+      );
+      const { error } = await supabase.from("bookings").update(dbPatch).eq("id", id);
+      if (error) console.error("booking update failed", error.message);
     },
     markArrived: (id) => {
       const b = bookings.find((x) => x.id === id);
