@@ -12,9 +12,12 @@
 - [x] Barber (and staff) replies to client reviews, shown publicly.
 - [x] Alerts area with a bell in the top bar; waitlist gets an instant alert when a slot frees up.
 - [x] No-show tracking: barber marks it from the day view, count shows on the client's admin card.
+- [x] Live streaming: broadcast from the camera inside GILT (peer-to-peer, no server cost), or plug in a YouTube/Twitch/TikTok/IG live link; live chat, viewer count, share, profile link, end-stream control.
 - [x] Security cleanup: internal role helper moved out of the public interface; one-time admin claim removed.
 
 ## Next ideas (free, not built yet)
+
+- [ ] Alert clients automatically when their barber goes live.
 
 - [ ] Per-barber cancellation window and deposit-keeping policy.
 - [ ] Automatic reminder alert 24 hours before an appointment.
