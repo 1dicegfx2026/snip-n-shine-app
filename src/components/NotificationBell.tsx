@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Bell } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { useNotifications } from "@/lib/notification-store";
 import { useAuth } from "@/lib/auth";
 
@@ -62,9 +61,9 @@ export function NotificationBell() {
                     n.read ? "" : "bg-gold/5"
                   }`;
                   return n.link ? (
-                    <Link key={n.id} to={n.link} className={cls} onClick={() => setOpen(false)}>
+                    <a key={n.id} href={n.link} className={cls} onClick={() => setOpen(false)}>
                       {inner}
-                    </Link>
+                    </a>
                   ) : (
                     <div key={n.id} className={cls}>
                       {inner}
