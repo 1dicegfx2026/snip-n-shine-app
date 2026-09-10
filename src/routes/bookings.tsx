@@ -26,9 +26,143 @@ function slotLabel(time: string) {
   return `${h % 12 === 0 ? 12 : h % 12}:${mStr} ${ampm}`;
 }
 
+function BookingEditCard({
+  booking,
+  onDone,
+}: {
+  booking: ReturnType<typeof useBookings>["bookings"][number];
+  onDone: () => void;
+}) {
+  const { updateBooking, bookedTimesFor } = useBookings();
+  const barber = getBarber(booking.barberSlug);
+  const days = useMemo(() => nextNDates(14), []);
+  const [serviceId, setServiceId] = useState(booking.serviceId);
+  const [dateISO, setDateISO] = useState(booking.dateISO);
+  const [time, setTime] = useState(booking.time);
+  const [saving, setSaving] = useState(false);
+
+  if (!barber) return null;
+  const service = barber.services.find((s) => s.id === serviceId);
+  const slots = dateISO ? getSlots(barber, dateISO, bookedTimesFor(barber.slug, dateISO)) : [];
+
+  const handleSave = async () => {
+    if (!serviceId || !dateISO || !time) {
+      toast.error("Elige servicio, día y hora.");
+      return;
+    }
+    setSaving(true);
+    await updateBooking(booking.id, { serviceId, dateISO, time });
+    setSaving(false);
+    toast.success("Cita actualizada.");
+    onDone();
+  };
+
+  return (
+    <div className="rounded-xl border border-gold/40 bg-card p-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <img
+          src={barber.avatar}
+          alt={`Portrait of ${barber.name}`}
+          loading="lazy"
+          width={512}
+          height={512}
+          className="h-16 w-16 rounded-xl border border-gold/30 object-cover"
+        />
+        <div className="flex-1 space-y-4">
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground">Servicio</label>
+            <select
+              value={serviceId}
+              onChange={(e) => setServiceId(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            >
+              {barber.services.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name} — ${s.price}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground">Día</label>
+            <div className="mt-2 flex gap-2 overflow-x-auto pb-2">
+              {days.map((d) => (
+                <button
+                  key={d.iso}
+                  type="button"
+                  onClick={() => {
+                    setDateISO(d.iso);
+                    setTime("");
+                  }}
+                  className={`flex min-w-[4.5rem] flex-col items-center rounded-lg border px-2 py-2 text-xs transition-colors ${
+                    dateISO === d.iso
+                      ? "border-gold bg-gold/15 text-gold"
+                      : "border-border bg-card hover:border-gold/50"
+                  }`}
+                >
+                  <span className="uppercase">{d.weekday}</span>
+                  <span className="font-display text-lg font-bold">{d.day}</span>
+                  <span className="uppercase">{d.month}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          {dateISO && (
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground">Hora</label>
+              <div className="mt-2 grid grid-cols-4 gap-2 sm:grid-cols-6">
+                {slots.map((s) => {
+                  const taken = s.status === "booked" && s.time !== booking.time;
+                  return (
+                    <button
+                      key={s.time}
+                      type="button"
+                      disabled={taken}
+                      onClick={() => setTime(s.time)}
+                      className={`rounded-lg border px-2 py-2 text-xs font-semibold transition-colors ${
+                        time === s.time
+                          ? "border-gold bg-gold/15 text-gold"
+                          : taken
+                            ? "cursor-not-allowed border-border bg-muted text-muted-foreground opacity-50"
+                            : "border-border bg-card hover:border-gold/50"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          <div className="flex items-center justify-between rounded-lg bg-gold/5 p-3 text-sm">
+            <span className="text-muted-foreground">Nuevo total</span>
+            <span className="font-bold text-gold">${service?.price ?? booking.total}</span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:bg-primary/85 disabled:opacity-50"
+            >
+              <Check size={14} /> Guardar
+            </button>
+            <button
+              onClick={onDone}
+              className="inline-flex items-center gap-1 rounded-lg border border-border px-4 py-2 text-sm font-semibold hover:bg-accent"
+            >
+              <X size={14} /> Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BookingsPage() {
   const { bookings, waitlist, cancelBooking, leaveWaitlist } = useBookings();
   const { user } = useAuth();
+  const [editingId, setEditingId] = useState<string | null>(null);
   const mine = bookings.filter((b) => b.clientId === user?.id);
   const upcoming = mine.filter((b) => b.status === "upcoming");
   const cancelled = mine.filter((b) => b.status === "cancelled");
@@ -59,6 +193,9 @@ function BookingsPage() {
             const barber = getBarber(b.barberSlug);
             const service = barber?.services.find((s) => s.id === b.serviceId);
             if (!barber) return null;
+            if (editingId === b.id) {
+              return <BookingEditCard key={b.id} booking={b} onDone={() => setEditingId(null)} />;
+            }
             return (
               <div
                 key={b.id}
@@ -91,15 +228,23 @@ function BookingsPage() {
                       ${b.amountPaid} paid ({b.payType === "deposit" ? "deposit" : "full"})
                     </p>
                   </div>
-                  <button
-                    onClick={() => {
-                      cancelBooking(b.id);
-                      toast.info("Booking cancelled — the slot is now open to others.");
-                    }}
-                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
-                  >
-                    Cancel
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setEditingId(b.id)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-gold hover:text-gold"
+                    >
+                      <Pencil size={13} /> Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        cancelBooking(b.id);
+                        toast.info("Booking cancelled — the slot is now open to others.");
+                      }}
+                      className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               </div>
             );
