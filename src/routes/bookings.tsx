@@ -223,9 +223,14 @@ function BookingsPage() {
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const { reviewFor } = useReviews();
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
   const mine = bookings.filter((b) => b.clientId === user?.id);
-  const upcoming = mine.filter((b) => b.status === "upcoming");
-  const cancelled = mine.filter((b) => b.status === "cancelled");
+  const upcoming = mine.filter((b) => b.status === "upcoming" || b.status === "arrived");
+  const past = mine.filter((b) => b.status === "completed");
+  const cancelled = mine.filter((b) => b.status === "cancelled" || b.status === "refunded");
+  const loyaltyDone = past.length % 5;
+  const spent = mine.reduce((sum, b) => sum + b.amountPaid, 0);
   const detailsBooking = mine.find((b) => b.id === detailsId);
   const detailsBarber = detailsBooking ? getBarber(detailsBooking.barberSlug) : undefined;
   const detailsService = detailsBarber?.services.find((s) => s.id === detailsBooking?.serviceId);
