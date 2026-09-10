@@ -52,7 +52,13 @@ function BookingFlow() {
   const total = service?.price ?? 0;
   const dueToday = payType === "deposit" ? Math.round(total * depositRate) : total;
 
-  const canConfirm = Boolean(service && dateISO && time && name.trim());
+  const missing = [
+    !service && "escoger el servicio",
+    !dateISO && "escoger el día",
+    !time && "escoger la hora",
+    !name.trim() && "escribir tu nombre",
+  ].filter(Boolean) as string[];
+  const canConfirm = missing.length === 0;
 
   if (confirmed && service) {
     return (
