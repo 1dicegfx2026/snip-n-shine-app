@@ -1,10 +1,11 @@
 import { AuthGate } from "@/components/AuthGate";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarX, BellRing, Hourglass, CalendarPlus, ArrowRight } from "lucide-react";
-import { getBarber, formatDateLong } from "@/lib/data/barbers";
+import { CalendarX, BellRing, Hourglass, CalendarPlus, ArrowRight, Pencil, X, Check } from "lucide-react";
+import { getBarber, formatDateLong, getSlots, nextNDates } from "@/lib/data/barbers";
 import { useBookings } from "@/lib/booking-store";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/bookings")({
   head: () => ({
