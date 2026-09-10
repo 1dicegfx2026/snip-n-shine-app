@@ -38,8 +38,8 @@ function AuthPage() {
   }, [user, loading, navigate]);
 
   const submit = async () => {
-    if (!email.trim() || password.length < 6) {
-      toast.error("Pon tu correo y una clave de 6 caracteres o más.");
+    if (!email.trim() || password.length < 8) {
+      toast.error("Pon tu correo y una clave de 8 caracteres o más, con números y símbolos.");
       return;
     }
     setBusy(true);
